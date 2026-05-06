@@ -1,45 +1,70 @@
-# [Project name]
+# ANVISA-RE Monitor
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A professional Brazilian government web system for managing ANVISA Specific Resolutions (REs) that suspend the commercialization, importation, distribution, or manufacturing of health products.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — API server (port 8080, proxied at `/api`)
+- `pnpm --filter @workspace/anvisa-re-monitor run dev` — Frontend (port 20622, proxied at `/`)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
+- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
+- Required env: `SESSION_SECRET` — JWT signing secret (Replit secret)
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
+- Frontend: React 18 + Vite + Tailwind CSS + shadcn/ui components + Recharts + React Query + Wouter routing
+- API: Express 5 + Pino logger
 - DB: PostgreSQL + Drizzle ORM
+- Auth: JWT via `jsonwebtoken` (SHA-256 password hashing with Node crypto)
 - Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
+- API codegen: Orval (from OpenAPI spec → React Query hooks + Zod schemas)
 - Build: esbuild (CJS bundle)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `lib/api-spec/openapi.yaml` — OpenAPI contract (source of truth for all API shapes)
+- `lib/api-client-react/src/generated/api.ts` — generated React Query hooks
+- `lib/api-zod/src/generated/api.ts` — generated Zod schemas (must only export from `./generated/api`)
+- `lib/db/src/schema/index.ts` — DB schema exports (`resolucoesEspecificas`, `usuarios`, `resolucoes_historico`)
+- `artifacts/api-server/src/routes/` — all route handlers
+- `artifacts/api-server/src/middlewares/auth.ts` — JWT auth middleware (`requireAuth`, `optionalAuth`, `requirePerfil`)
+- `artifacts/anvisa-re-monitor/src/pages/` — all frontend pages
+- `artifacts/anvisa-re-monitor/src/contexts/AuthContext.tsx` — auth state + JWT token management
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- **JWT auth with `setAuthTokenGetter`**: The custom-fetch layer in `@workspace/api-client-react` auto-injects `Authorization: Bearer <token>` from localStorage via `setAuthTokenGetter` called once at app startup in `App.tsx`.
+- **Soft delete**: REs use `deleted_at` column (never physically deleted); all queries filter `isNull(deleted_at)`.
+- **Audit log**: Every RE create/update/delete creates a record in `resolucoes_historico` with before/after JSON snapshots.
+- **No bcrypt**: Passwords hashed with SHA-256 via Node `crypto` to avoid native deps in esbuild bundle.
+- **Public portal + admin area**: The `/` route is a public search portal; `/dashboard`, `/resolucoes` (list/edit), `/usuarios`, `/relatorios` require auth and show sidebar layout.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- **Public portal** (`/`): searchable, filterable list of all REs with status badges; detail page accessible without login
+- **Dashboard** (`/dashboard`): KPI stats, bar/pie charts by category and status, recent REs list
+- **RE management** (`/resolucoes`): full CRUD with search, multi-filter, sort, audit history
+- **User management** (`/usuarios`): create/edit/activate/deactivate users, role-based access (admin only)
+- **Reports** (`/relatorios`): monthly reports with charts, CSV/XLSX/PDF export
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Stack: React+Vite frontend, Node.js/Express backend (NOT Python), PostgreSQL built-in DB
+- Full PRD at `attached_assets/ANVISA_RE_Monitor_PRD_v1.3_1778088798287.pdf`
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- After running codegen (`pnpm --filter @workspace/api-spec run codegen`), check `lib/api-zod/src/index.ts` — it must only contain `export * from "./generated/api";`
+- API server must be **restarted** after adding new routes (it runs a build step); use `restart_workflow "artifacts/api-server: API Server"`
+- Demo credentials: `admin@anvisa.gov.br` / `anvisa2026` (admin), `fiscal@anvisa.gov.br` / `fiscal2026` (fiscal)
+- `tipo_acao` is stored as `text[]` array in PostgreSQL
+- Status enum: `vigente` (red), `revogada` (gray), `encerrada` (blue), `em_analise` (orange)
 
 ## Pointers
 
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- See `.local/skills/pnpm-workspace/` for workspace structure, TypeScript setup, and package details
+- See `.local/skills/react-vite/` for React+Vite conventions

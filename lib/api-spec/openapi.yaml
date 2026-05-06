@@ -3,13 +3,26 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: ANVISA-RE Monitor API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: resolucoes
+    description: Gestão de Resoluções Específicas
+  - name: auth
+    description: Autenticação e sessão
+  - name: usuarios
+    description: Gestão de usuários
+  - name: dashboard
+    description: Dashboard e estatísticas
+  - name: relatorios
+    description: Relatórios e exportações
+  - name: categorias
+    description: Categorias e domínios
+
 paths:
   /healthz:
     get:
@@ -24,6 +37,555 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /v1/resolucoes:
+    get:
+      operationId: listResolucoes
+      tags: [resolucoes]
+      summary: Listar Resoluções Específicas com filtros e paginação
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: Busca full-text (nome do produto, princípio ativo, fabricante, ementa)
+        - name: status
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: "Filtro por status: vigente, revogada, encerrada, em_analise"
+        - name: tipo_produto
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: Filtro por categoria de produto
+        - name: tipo_acao
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: Filtro por tipo de ação sanitária
+        - name: data_inicio
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: "Data de publicação início (ISO 8601: YYYY-MM-DD)"
+        - name: data_fim
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: "Data de publicação fim (ISO 8601: YYYY-MM-DD)"
+        - name: numero_re
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: Número exato da RE
+        - name: numero_registro_anvisa
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: Número de registro ANVISA
+        - name: fabricante_cnpj
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: CNPJ do fabricante
+        - name: page
+          in: query
+          schema:
+            type: ["integer", "null"]
+          description: Página (default 1)
+        - name: limit
+          in: query
+          schema:
+            type: ["integer", "null"]
+          description: Itens por página (default 20, max 100)
+        - name: order_by
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: "Campo de ordenação (default: data_publicacao)"
+        - name: order_dir
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: "Direção: asc ou desc"
+      responses:
+        "200":
+          description: Lista paginada de REs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedResolucoes"
+
+    post:
+      operationId: createResolucao
+      tags: [resolucoes]
+      summary: Criar nova Resolução Específica
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateResolucaoBody"
+      responses:
+        "201":
+          description: RE criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resolucao"
+        "400":
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Não autenticado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/resolucoes/exportar:
+    get:
+      operationId: exportarResolucoes
+      tags: [resolucoes]
+      summary: Exportar resultados de busca em CSV, XLSX ou PDF
+      parameters:
+        - name: formato
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Formato de exportação: csv, xlsx, pdf"
+        - name: q
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: status
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: tipo_produto
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: tipo_acao
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: data_inicio
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: data_fim
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: Arquivo exportado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportResponse"
+        "400":
+          description: Formato inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/resolucoes/{id}:
+    get:
+      operationId: getResolucao
+      tags: [resolucoes]
+      summary: Detalhe completo de uma RE
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detalhe da RE
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resolucao"
+        "404":
+          description: RE não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      operationId: updateResolucao
+      tags: [resolucoes]
+      summary: Atualizar RE existente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateResolucaoBody"
+      responses:
+        "200":
+          description: RE atualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resolucao"
+        "400":
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Não autenticado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: RE não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      operationId: deleteResolucao
+      tags: [resolucoes]
+      summary: Exclusão lógica (soft delete) de uma RE
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: RE removida com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Não autenticado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: RE não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/resolucoes/{id}/historico:
+    get:
+      operationId: getResolucaoHistorico
+      tags: [resolucoes]
+      summary: Histórico de alterações de uma RE
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de versões/alterações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoricoEntry"
+        "404":
+          description: RE não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Autenticação e emissão de token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Autenticado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Credenciais inválidas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Revogar token / encerrar sessão
+      responses:
+        "200":
+          description: Sessão encerrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /v1/auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Retorna dados do usuário autenticado
+      responses:
+        "200":
+          description: Dados do usuário atual
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "401":
+          description: Não autenticado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/usuarios:
+    get:
+      operationId: listUsuarios
+      tags: [usuarios]
+      summary: Listar usuários do sistema (Admin)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: limit
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: q
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedUsuarios"
+        "401":
+          description: Não autenticado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Sem permissão
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    post:
+      operationId: createUsuario
+      tags: [usuarios]
+      summary: Criar novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUsuarioBody"
+      responses:
+        "201":
+          description: Usuário criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "400":
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/usuarios/{id}:
+    put:
+      operationId: updateUsuario
+      tags: [usuarios]
+      summary: Atualizar usuário (perfil, status)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUsuarioBody"
+      responses:
+        "200":
+          description: Usuário atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "404":
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Estatísticas gerais para o dashboard (KPIs, totais, distribuições)
+      responses:
+        "200":
+          description: Estatísticas do sistema
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /v1/dashboard/recentes:
+    get:
+      operationId: getRecentesResolucoes
+      tags: [dashboard]
+      summary: Últimas REs cadastradas ou atualizadas
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: REs recentes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResolucaoResumida"
+
+  /v1/dashboard/por-categoria:
+    get:
+      operationId: getResolucoesPorCategoria
+      tags: [dashboard]
+      summary: Contagem de REs vigentes agrupadas por categoria de produto
+      responses:
+        "200":
+          description: Distribuição por categoria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategoriaCount"
+
+  /v1/dashboard/por-status:
+    get:
+      operationId: getResolucoesPorStatus
+      tags: [dashboard]
+      summary: Contagem de REs agrupadas por status
+      responses:
+        "200":
+          description: Distribuição por status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StatusCount"
+
+  /v1/relatorios/mensal:
+    get:
+      operationId: getRelatorioMensal
+      tags: [relatorios]
+      summary: Relatório mensal de novas REs publicadas por categoria
+      parameters:
+        - name: ano
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: mes
+          in: query
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: Relatório mensal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelatorioMensal"
+
+  /v1/categorias:
+    get:
+      operationId: listCategorias
+      tags: [categorias]
+      summary: Listar categorias de produto
+      responses:
+        "200":
+          description: Lista de categorias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Categoria"
+
+  /v1/tipos-acao:
+    get:
+      operationId: listTiposAcao
+      tags: [categorias]
+      summary: Listar tipos de ação sanitária
+      responses:
+        "200":
+          description: Lista de tipos de ação
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TipoAcao"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +596,464 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    Resolucao:
+      type: object
+      properties:
+        id:
+          type: string
+        numero_re:
+          type: string
+        data_publicacao:
+          type: string
+        data_vigencia_inicio:
+          type: string
+        data_vigencia_fim:
+          type: ["string", "null"]
+        status:
+          type: string
+          description: "vigente | revogada | encerrada | em_analise"
+        tipo_produto:
+          type: string
+        tipo_acao:
+          type: array
+          items:
+            type: string
+        nome_produto:
+          type: string
+        principio_ativo:
+          type: ["string", "null"]
+        fabricante_nome:
+          type: ["string", "null"]
+        fabricante_cnpj:
+          type: ["string", "null"]
+        numero_registro_anvisa:
+          type: ["string", "null"]
+        ementa:
+          type: string
+        link_documento_oficial:
+          type: ["string", "null"]
+        arquivo_pdf_path:
+          type: ["string", "null"]
+        criado_por:
+          type: ["string", "null"]
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        deleted_at:
+          type: ["string", "null"]
+      required:
+        - id
+        - numero_re
+        - data_publicacao
+        - data_vigencia_inicio
+        - status
+        - tipo_produto
+        - tipo_acao
+        - nome_produto
+        - ementa
+        - created_at
+        - updated_at
+
+    ResolucaoResumida:
+      type: object
+      properties:
+        id:
+          type: string
+        numero_re:
+          type: string
+        nome_produto:
+          type: string
+        status:
+          type: string
+        tipo_produto:
+          type: string
+        data_publicacao:
+          type: string
+        fabricante_nome:
+          type: ["string", "null"]
+        updated_at:
+          type: string
+      required:
+        - id
+        - numero_re
+        - nome_produto
+        - status
+        - tipo_produto
+        - data_publicacao
+        - updated_at
+
+    PaginatedResolucoes:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Resolucao"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_pages:
+          type: integer
+      required:
+        - data
+        - total
+        - page
+        - limit
+        - total_pages
+
+    CreateResolucaoBody:
+      type: object
+      properties:
+        numero_re:
+          type: string
+        data_publicacao:
+          type: string
+        data_vigencia_inicio:
+          type: string
+        data_vigencia_fim:
+          type: ["string", "null"]
+        status:
+          type: string
+        tipo_produto:
+          type: string
+        tipo_acao:
+          type: array
+          items:
+            type: string
+        nome_produto:
+          type: string
+        principio_ativo:
+          type: ["string", "null"]
+        fabricante_nome:
+          type: ["string", "null"]
+        fabricante_cnpj:
+          type: ["string", "null"]
+        numero_registro_anvisa:
+          type: ["string", "null"]
+        ementa:
+          type: string
+        link_documento_oficial:
+          type: ["string", "null"]
+        arquivo_pdf_path:
+          type: ["string", "null"]
+      required:
+        - numero_re
+        - data_publicacao
+        - data_vigencia_inicio
+        - status
+        - tipo_produto
+        - tipo_acao
+        - nome_produto
+        - ementa
+
+    UpdateResolucaoBody:
+      type: object
+      properties:
+        data_vigencia_fim:
+          type: ["string", "null"]
+        status:
+          type: ["string", "null"]
+        tipo_produto:
+          type: ["string", "null"]
+        tipo_acao:
+          type: ["array", "null"]
+          items:
+            type: string
+        nome_produto:
+          type: ["string", "null"]
+        principio_ativo:
+          type: ["string", "null"]
+        fabricante_nome:
+          type: ["string", "null"]
+        fabricante_cnpj:
+          type: ["string", "null"]
+        numero_registro_anvisa:
+          type: ["string", "null"]
+        ementa:
+          type: ["string", "null"]
+        link_documento_oficial:
+          type: ["string", "null"]
+        arquivo_pdf_path:
+          type: ["string", "null"]
+        justificativa_alteracao:
+          type: ["string", "null"]
+
+    HistoricoEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        resolucao_id:
+          type: string
+        campo_alterado:
+          type: ["string", "null"]
+        valor_anterior:
+          type: ["string", "null"]
+        valor_novo:
+          type: ["string", "null"]
+        justificativa:
+          type: ["string", "null"]
+        alterado_por:
+          type: ["string", "null"]
+        alterado_por_nome:
+          type: ["string", "null"]
+        fonte:
+          type: string
+        created_at:
+          type: string
+        dados_anteriores:
+          type: ["object", "null"]
+        dados_novos:
+          type: ["object", "null"]
+      required:
+        - id
+        - resolucao_id
+        - fonte
+        - created_at
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+        senha:
+          type: string
+      required:
+        - email
+        - senha
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        usuario:
+          $ref: "#/components/schemas/Usuario"
+      required:
+        - token
+        - usuario
+
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: string
+        nome:
+          type: string
+        email:
+          type: string
+        perfil:
+          type: string
+          description: "administrador | fiscal | profissional_saude | cidadao"
+        ativo:
+          type: boolean
+        created_at:
+          type: string
+        ultimo_acesso:
+          type: ["string", "null"]
+      required:
+        - id
+        - nome
+        - email
+        - perfil
+        - ativo
+        - created_at
+
+    PaginatedUsuarios:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Usuario"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_pages:
+          type: integer
+      required:
+        - data
+        - total
+        - page
+        - limit
+        - total_pages
+
+    CreateUsuarioBody:
+      type: object
+      properties:
+        nome:
+          type: string
+        email:
+          type: string
+        senha:
+          type: string
+        perfil:
+          type: string
+      required:
+        - nome
+        - email
+        - senha
+        - perfil
+
+    UpdateUsuarioBody:
+      type: object
+      properties:
+        nome:
+          type: ["string", "null"]
+        perfil:
+          type: ["string", "null"]
+        ativo:
+          type: ["boolean", "null"]
+        senha:
+          type: ["string", "null"]
+
+    DashboardStats:
+      type: object
+      properties:
+        total_resolucoes:
+          type: integer
+        vigentes:
+          type: integer
+        revogadas:
+          type: integer
+        encerradas:
+          type: integer
+        em_analise:
+          type: integer
+        novas_este_mes:
+          type: integer
+        total_usuarios:
+          type: integer
+        ultima_atualizacao:
+          type: string
+      required:
+        - total_resolucoes
+        - vigentes
+        - revogadas
+        - encerradas
+        - em_analise
+        - novas_este_mes
+        - total_usuarios
+        - ultima_atualizacao
+
+    CategoriaCount:
+      type: object
+      properties:
+        categoria:
+          type: string
+        total:
+          type: integer
+        vigentes:
+          type: integer
+      required:
+        - categoria
+        - total
+        - vigentes
+
+    StatusCount:
+      type: object
+      properties:
+        status:
+          type: string
+        total:
+          type: integer
+      required:
+        - status
+        - total
+
+    RelatorioMensal:
+      type: object
+      properties:
+        ano:
+          type: integer
+        mes:
+          type: integer
+        total_novas:
+          type: integer
+        por_categoria:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoriaCount"
+        por_status:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatusCount"
+        resolucoes:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResolucaoResumida"
+      required:
+        - ano
+        - mes
+        - total_novas
+        - por_categoria
+        - por_status
+        - resolucoes
+
+    ExportResponse:
+      type: object
+      properties:
+        url:
+          type: string
+        formato:
+          type: string
+        total_registros:
+          type: integer
+        filename:
+          type: string
+      required:
+        - url
+        - formato
+        - total_registros
+        - filename
+
+    Categoria:
+      type: object
+      properties:
+        id:
+          type: string
+        nome:
+          type: string
+        descricao:
+          type: ["string", "null"]
+        exemplos:
+          type: ["string", "null"]
+      required:
+        - id
+        - nome
+
+    TipoAcao:
+      type: object
+      properties:
+        id:
+          type: string
+        nome:
+          type: string
+        descricao:
+          type: ["string", "null"]
+      required:
+        - id
+        - nome
