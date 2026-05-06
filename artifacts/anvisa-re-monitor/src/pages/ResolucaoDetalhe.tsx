@@ -40,7 +40,7 @@ export default function ResolucaoDetalhe() {
           <AlertTriangle className="w-12 h-12 text-destructive mx-auto mb-3" />
           <h2 className="text-xl font-bold">Resolucao nao encontrada</h2>
           <p className="text-muted-foreground mt-1 mb-4">O ID informado nao corresponde a nenhuma RE cadastrada.</p>
-          <Button onClick={() => setLocation("/")}>Voltar ao Portal</Button>
+          <Button onClick={() => (window.location.href = "/")}>Voltar ao Portal</Button>
         </div>
       </div>
     );
@@ -71,12 +71,10 @@ export default function ResolucaoDetalhe() {
 
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Back */}
-        <Link href="/">
-          <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            Voltar ao Portal
-          </button>
-        </Link>
+        <a href="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors w-fit">
+          <ArrowLeft className="w-4 h-4" />
+          Voltar ao Portal
+        </a>
 
         {/* Status banner */}
         <div className={`rounded-lg p-4 mb-6 flex items-start gap-3 ${
@@ -192,9 +190,9 @@ export default function ResolucaoDetalhe() {
         {/* Edit button for authenticated users */}
         {isAuthenticated && (
           <div className="flex justify-end mt-4">
-            <Link href={`/resolucoes/${re.id}/editar`}>
+            <a href={`/resolucoes/${re.id}/editar`}>
               <Button variant="outline" size="sm">Editar esta RE</Button>
-            </Link>
+            </a>
           </div>
         )}
       </div>
