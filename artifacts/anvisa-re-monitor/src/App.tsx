@@ -83,9 +83,7 @@ function Router() {
               )}
             </Route>
             {/* Public: detail view (any user can access) */}
-            <Route path="/:id" nest>
-              {({ params }) => <ResolucaoDetalhe params={params as any} />}
-            </Route>
+            <Route path="/:id" component={ResolucaoDetalhe} />
           </Switch>
         )}
       </Route>

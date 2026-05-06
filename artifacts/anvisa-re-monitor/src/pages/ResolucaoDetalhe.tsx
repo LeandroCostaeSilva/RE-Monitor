@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useParams } from "wouter";
 import { ArrowLeft, ExternalLink, Clock, FileText, AlertTriangle, Shield } from "lucide-react";
 import { useGetResolucao, useGetResolucaoHistorico } from "@workspace/api-client-react";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -7,12 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface Props {
-  params: { id: string };
-}
-
-export default function ResolucaoDetalhe({ params }: Props) {
-  const { id } = params;
+export default function ResolucaoDetalhe() {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
   const [, setLocation] = useLocation();
   const { isAuthenticated } = useAuth();
 
