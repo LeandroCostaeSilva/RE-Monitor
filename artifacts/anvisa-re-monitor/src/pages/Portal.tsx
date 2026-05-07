@@ -50,8 +50,8 @@ export default function Portal() {
           <div className="flex items-center gap-3">
             <Shield className="w-7 h-7" />
             <div>
-              <h1 className="font-bold text-lg leading-tight">ANVISA-RE Monitor</h1>
-              <p className="text-xs opacity-75">Consulta Publica de Resolucoes Especificas</p>
+              <h1 className="font-bold text-lg leading-tight">RE MONITOR</h1>
+              <p className="text-xs opacity-75">Consulta Pública de Resoluções - RE ANVISA publicadas em DOU</p>
             </div>
           </div>
         </div>
