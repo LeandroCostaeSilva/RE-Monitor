@@ -276,27 +276,35 @@ Para cada RE encontrada no texto, extraia os campos abaixo.
 Se o campo não estiver presente no texto, use null (não invente dados).
 
 Campos obrigatórios:
-- numero_re: string no formato "RE nº X.XXX/AAAA"  (ex: "RE nº 5.400/2025")
+- numero_re: string no formato "RE nº X.XXX/AAAA" (ex: "RE nº 5.400/2025", "RE nº 2.875/2023").
+  ATENÇÃO: Se o texto usar formato "RE nº X.XXX, de DD de MMMM de AAAA", extraia o ano da data e converta para "RE nº X.XXX/AAAA".
 - data_publicacao: string "AAAA-MM-DD"
 - data_vigencia_inicio: string "AAAA-MM-DD" (geralmente igual à data_publicacao)
 - status: "vigente" | "revogada" | "encerrada" | "em_analise"
 - tipo_produto: um de [${TIPO_PRODUTO_VALUES.join(",")}]
+  Exemplos: medicamentos, alimentos (inclui vegetais/plantas alimentícias como ora-pro-nobis), droga_vegetal (plantas medicinais), cosmeticos, saneantes
 - tipo_acao: array com um ou mais de [${TIPO_ACAO_VALUES.join(",")}]
-- nome_produto: nome completo do produto
-- ementa: parágrafo técnico resumindo o motivo da suspensão
+- nome_produto: nome completo do produto (pode ser apenas um vegetal, ingrediente ou substância sem fabricante específico)
+- ementa: resumo técnico da RE (pode ser curto se o texto for conciso)
 
-Campos opcionais (null se não disponível):
+Campos opcionais — use null quando não se aplica:
 - data_vigencia_fim: "AAAA-MM-DD" ou null
-- principio_ativo: null se não aplicável
-- fabricante_nome: razão social do fabricante
-- fabricante_cnpj: no formato "XX.XXX.XXX/XXXX-XX"
-- numero_registro_anvisa: código de registro no formato "X.XXXX.XXXX.XXX-X" ou similar
-- lotes_afetados: array de strings com os lotes identificados (ex: ["L2025001","L2025002"])
-- recolhimento_determinado: true se o texto menciona recolhimento de mercado, false caso contrário
-- link_documento_oficial: URL se mencionado no texto, senão null
-- numero_dou_edicao: número da edição do DOU (ex: "84")
-- secao_dou: número da seção do DOU (1, 2 ou 3), geralmente 1 para ANVISA
-- pagina_dou: número da página no DOU
+- principio_ativo: null se não aplicável ou não informado
+- fabricante_nome: null se a proibição se aplica ao PRODUTO EM GERAL (não a uma empresa específica).
+  Exemplos de quando usar null: proibição de um vegetal (ora-pro-nobis, açaí), substância sem fabricante identificado, produto sem registro de empresa.
+- fabricante_cnpj: null se fabricante_nome for null OU se o CNPJ não for mencionado no texto.
+  NUNCA invente CNPJ. Use null quando a RE não citar CNPJ.
+- numero_registro_anvisa: null se não mencionado
+- lotes_afetados: array de lotes se mencionados, ou [] se não houver lotes específicos
+- recolhimento_determinado: true se menciona recolhimento de mercado, false caso contrário
+- link_documento_oficial: URL se mencionado, senão null
+- numero_dou_edicao: número da edição do DOU ou null
+- secao_dou: número da seção (1, 2 ou 3) ou null
+- pagina_dou: número da página ou null
+
+REGRA CRÍTICA: fabricante_nome e fabricante_cnpj devem ser null quando:
+  - A RE proíbe um produto/substância/vegetal de forma geral (sem vincular a fabricante)
+  - O texto não cita razão social ou CNPJ de empresa
 
 IMPORTANTE: Responda SEMPRE com JSON puro, sem markdown, sem explicações.
 Use EXATAMENTE este formato: {"resolucoes": [{...campos...}]}
@@ -384,13 +392,43 @@ function extractItemsFromRaw(raw: string): unknown[] {
   return [];
 }
 
+/**
+ * Normalizes numero_re from DOU formats:
+ *   "RE nº 2.875, de 1º de agosto de 2023" → "RE nº 2.875/2023"
+ *   "RE nº 5.400/2025" → "RE nº 5.400/2025" (unchanged)
+ */
+function normalizeNumeroRE(raw: string): string {
+  if (!raw) return raw;
+  const s = raw.trim();
+
+  // Already in canonical format: "RE nº X.XXX/AAAA"
+  const canonical = s.match(/RE\s+n[oº°]\s*([\d.]+)\/(\d{4})/i);
+  if (canonical) {
+    return `RE nº ${canonical[1]!.replace(/\./g, "").replace(/(\d+)/, (n) => Number(n).toLocaleString("pt-BR"))}\/${canonical[2]}`;
+  }
+
+  // Format: "RE nº X.XXX, de DD de MMMM de AAAA"
+  const withDate = s.match(/RE\s+n[oº°]\s*([\d.]+)[,\s]+de\s+\d+[oº°]?\s+de\s+(\w+)\s+de\s+(\d{4})/i);
+  if (withDate) {
+    return `RE nº ${withDate[1]!}/${withDate[3]!}`;
+  }
+
+  // Fallback: extract number and year if present
+  const numYear = s.match(/(\d[\d.]*)\s*[/,]\s*(\d{4})/);
+  if (numYear) {
+    return `RE nº ${numYear[1]!}/${numYear[2]!}`;
+  }
+
+  return s;
+}
+
 function isValidParsedRE(item: unknown): item is Partial<ParsedRE> {
   if (!item || typeof item !== "object") return false;
   const r = item as Record<string, unknown>;
   return (
     typeof r["numero_re"] === "string" && r["numero_re"].length > 3 &&
-    typeof r["nome_produto"] === "string" && r["nome_produto"].length > 2 &&
-    typeof r["ementa"] === "string" && r["ementa"].length > 10
+    typeof r["nome_produto"] === "string" && r["nome_produto"].length > 1 &&
+    typeof r["ementa"] === "string" && r["ementa"].length > 5
   );
 }
 
@@ -398,7 +436,7 @@ function normalizeRE(item: Partial<ParsedRE>, fallbackDate: string): ParsedRE {
   const r = item as Record<string, unknown>;
   const today = fallbackDate;
   return {
-    numero_re: String(r["numero_re"] ?? "").trim(),
+    numero_re: normalizeNumeroRE(String(r["numero_re"] ?? "").trim()),
     data_publicacao: String(r["data_publicacao"] ?? today).slice(0, 10) || today,
     data_vigencia_inicio: String(r["data_vigencia_inicio"] ?? r["data_publicacao"] ?? today).slice(0, 10) || today,
     data_vigencia_fim: r["data_vigencia_fim"] ? String(r["data_vigencia_fim"]).slice(0, 10) : undefined,
