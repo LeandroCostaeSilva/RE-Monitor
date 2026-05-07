@@ -26,8 +26,8 @@ export function Sidebar() {
         <div className="flex items-center gap-2">
           <Shield className="w-6 h-6 text-blue-400" />
           <div>
-            <p className="font-bold text-sm tracking-wide text-white">ANVISA-RE</p>
-            <p className="text-[10px] text-blue-300 uppercase tracking-widest">Monitor</p>
+            <p className="font-bold text-sm tracking-wide text-white">RE MONITOR</p>
+            <p className="text-[10px] text-blue-300 leading-tight" style={{fontSize:"9px"}}>Consulta Pública de Resoluções - RE ANVISA publicadas em DOU</p>
           </div>
         </div>
       </div>
