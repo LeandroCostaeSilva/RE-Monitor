@@ -140,7 +140,7 @@ async function main() {
           ${re.data_vigencia_inicio},
           ${re.status},
           ${re.tipo_produto},
-          ${re.tipo_acao as string[]},
+          ${[...re.tipo_acao] as string[]},
           ${re.nome_produto},
           ${"principio_ativo" in re ? re.principio_ativo ?? null : null},
           ${"fabricante_nome" in re ? re.fabricante_nome ?? null : null},

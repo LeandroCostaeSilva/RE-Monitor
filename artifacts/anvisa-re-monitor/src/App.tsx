@@ -14,6 +14,7 @@ import ResolucaoDetalhe from "@/pages/ResolucaoDetalhe";
 import ResolucaoForm from "@/pages/ResolucaoForm";
 import Usuarios from "@/pages/Usuarios";
 import Relatorios from "@/pages/Relatorios";
+import SincronizacaoDou from "@/pages/SincronizacaoDou";
 import NotFound from "@/pages/not-found";
 
 // Wire JWT token to API client
@@ -97,6 +98,9 @@ function Router() {
       </Route>
       <Route path="/relatorios">
         <AdminLayout><Relatorios /></AdminLayout>
+      </Route>
+      <Route path="/sincronizacao">
+        <AdminLayout><SincronizacaoDou /></AdminLayout>
       </Route>
 
       <Route component={NotFound} />

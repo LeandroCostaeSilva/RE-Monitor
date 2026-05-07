@@ -6,6 +6,7 @@ import {
   timestamp,
   uuid,
   boolean,
+  integer,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
@@ -27,6 +28,12 @@ export const resolucoesEspecificasTable = pgTable("resolucoes_especificas", {
   ementa: text("ementa").notNull(),
   link_documento_oficial: text("link_documento_oficial"),
   arquivo_pdf_path: text("arquivo_pdf_path"),
+  lotes_afetados: text("lotes_afetados").array().default([]),
+  recolhimento_determinado: boolean("recolhimento_determinado").default(false),
+  numero_dou_edicao: varchar("numero_dou_edicao", { length: 60 }),
+  origem_dado: varchar("origem_dado", { length: 20 }).default("manual"),
+  pagina_dou: integer("pagina_dou"),
+  secao_dou: integer("secao_dou"),
   criado_por: uuid("criado_por"),
   created_at: timestamp("created_at", { withTimezone: true })
     .notNull()

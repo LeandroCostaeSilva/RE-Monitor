@@ -10,6 +10,7 @@ import {
   LogOut,
   Shield,
   ChevronRight,
+  RefreshCw,
 } from "lucide-react";
 import { useLogout } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -19,6 +20,7 @@ const navItems = [
   { href: "/resolucoes", label: "Resoluções (Admin)", icon: FileText, roles: ["administrador", "fiscal"] },
   { href: "/usuarios", label: "Usuarios", icon: Users, roles: ["administrador"] },
   { href: "/relatorios", label: "Relatorios", icon: BarChart3, roles: ["administrador", "fiscal"] },
+  { href: "/sincronizacao", label: "Sincronização DOU", icon: RefreshCw, roles: ["administrador"] },
 ];
 
 export function Sidebar() {

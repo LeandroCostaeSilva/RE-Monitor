@@ -6,6 +6,7 @@ import usuariosRouter from "./usuarios";
 import dashboardRouter from "./dashboard";
 import relatoriosRouter from "./relatorios";
 import categoriasRouter from "./categorias";
+import adminRouter from "./admin";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(usuariosRouter);
 router.use(dashboardRouter);
 router.use(relatoriosRouter);
 router.use(categoriasRouter);
+router.use(adminRouter);
 
 export default router;
