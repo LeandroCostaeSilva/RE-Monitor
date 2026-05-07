@@ -5,10 +5,10 @@ import {
   FileText,
   BarChart3,
   Search,
-  Shield,
   ChevronRight,
   RefreshCw,
 } from "lucide-react";
+import logoImg from "/logo.png";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -24,7 +24,7 @@ export function Sidebar() {
     <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground w-64 min-h-screen">
       <div className="px-6 py-5 border-b border-sidebar-border">
         <div className="flex items-center gap-2">
-          <Shield className="w-6 h-6 text-blue-400" />
+          <img src={logoImg} alt="RE Monitor Logo" className="w-8 h-8 object-contain" />
           <div>
             <p className="font-bold text-sm tracking-wide text-white">RE MONITOR</p>
             <p className="text-[10px] text-blue-300 leading-tight" style={{fontSize:"9px"}}>Consulta Pública de Resoluções - RE ANVISA publicadas em DOU</p>

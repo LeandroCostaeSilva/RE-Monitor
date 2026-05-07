@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Search, Filter, Shield, ChevronRight, X, ExternalLink, AlertCircle } from "lucide-react";
+import { Search, Filter, ChevronRight, X, ExternalLink, AlertCircle } from "lucide-react";
+import logoImg from "/logo.png";
 import { useListResolucoes, useListCategorias, useListTiposAcao } from "@workspace/api-client-react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -48,7 +49,7 @@ export default function Portal() {
       <header className="bg-primary text-primary-foreground shadow-md">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Shield className="w-7 h-7" />
+            <img src={logoImg} alt="RE Monitor Logo" className="w-9 h-9 object-contain" />
             <div>
               <h1 className="font-bold text-lg leading-tight">RE MONITOR</h1>
               <p className="text-xs opacity-75">Consulta Pública de Resoluções - RE ANVISA publicadas em DOU</p>
