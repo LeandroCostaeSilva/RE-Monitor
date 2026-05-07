@@ -5,19 +5,16 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/contexts/AuthContext";
-
 export default function ResolucaoDetalhe() {
   const params = useParams<{ id: string }>();
   const id = params.id;
   const [, setLocation] = useLocation();
-  const { isAuthenticated } = useAuth();
 
   const { data: re, isLoading, isError } = useGetResolucao(id, {
     query: { queryKey: ["resolucao", id] },
   });
   const { data: historico, isLoading: historicoLoading } = useGetResolucaoHistorico(id, {
-    query: { enabled: isAuthenticated, queryKey: ["historico", id] },
+    query: { queryKey: ["historico", id] },
   });
 
   if (isLoading) {
@@ -146,9 +143,8 @@ export default function ResolucaoDetalhe() {
           )}
         </div>
 
-        {/* Historico (only for authenticated users) */}
-        {isAuthenticated && (
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
+        {/* Historico */}
+        <div className="bg-card border border-border rounded-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-border flex items-center gap-2">
               <Clock className="w-4 h-4 text-muted-foreground" />
               <h2 className="font-semibold text-sm">Historico de Alteracoes</h2>
@@ -185,16 +181,12 @@ export default function ResolucaoDetalhe() {
               )}
             </div>
           </div>
-        )}
 
-        {/* Edit button for authenticated users */}
-        {isAuthenticated && (
-          <div className="flex justify-end mt-4">
-            <a href={`/resolucoes/${re.id}/editar`}>
-              <Button variant="outline" size="sm">Editar esta RE</Button>
-            </a>
-          </div>
-        )}
+        <div className="flex justify-end mt-4">
+          <a href={`/resolucoes/${re.id}/editar`}>
+            <Button variant="outline" size="sm">Editar esta RE</Button>
+          </a>
+        </div>
       </div>
     </div>
   );

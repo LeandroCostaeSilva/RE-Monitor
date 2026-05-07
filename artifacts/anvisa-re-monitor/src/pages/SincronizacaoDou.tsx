@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface SyncLog {
@@ -28,12 +27,10 @@ interface SyncLog {
 const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
 
 async function apiFetch(path: string, init?: RequestInit) {
-  const token = localStorage.getItem("anvisa_token");
   const res = await fetch(`${BASE}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init?.headers ?? {}),
     },
   });
@@ -75,7 +72,6 @@ function duration(inicio: string, fim: string | null) {
 }
 
 export default function SincronizacaoDou() {
-  const { user } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
 
@@ -141,18 +137,6 @@ export default function SincronizacaoDou() {
   const logs = logsData?.data ?? [];
   const latest = latestData?.data;
   const isRunning = latest?.status === "running";
-
-  if (user?.perfil !== "administrador" && user?.perfil !== "admin") {
-    return (
-      <div className="p-8 flex items-center justify-center">
-        <div className="text-center">
-          <XCircle className="w-12 h-12 text-destructive mx-auto mb-3" />
-          <h2 className="text-xl font-bold">Acesso restrito</h2>
-          <p className="text-muted-foreground mt-1">Esta página é exclusiva para administradores.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">

@@ -2,12 +2,11 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { resolucoesEspecificasTable } from "@workspace/db";
 import { isNull, sql, desc, and, gte, lte } from "drizzle-orm";
-import { requireAuth } from "../middlewares/auth";
 
 const router = Router();
 
 // GET /v1/relatorios/mensal
-router.get("/v1/relatorios/mensal", requireAuth, async (req, res) => {
+router.get("/v1/relatorios/mensal", async (req, res) => {
   try {
     const now = new Date();
     const {

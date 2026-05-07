@@ -1,24 +1,17 @@
-import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { setAuthTokenGetter } from "@workspace/api-client-react";
 
 import Portal from "@/pages/Portal";
-import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Resolucoes from "@/pages/Resolucoes";
 import ResolucaoDetalhe from "@/pages/ResolucaoDetalhe";
 import ResolucaoForm from "@/pages/ResolucaoForm";
-import Usuarios from "@/pages/Usuarios";
 import Relatorios from "@/pages/Relatorios";
 import SincronizacaoDou from "@/pages/SincronizacaoDou";
 import NotFound from "@/pages/not-found";
-
-// Wire JWT token to API client
-setAuthTokenGetter(() => localStorage.getItem("anvisa_token"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,21 +22,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground text-sm">Carregando...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Redirect to="/login" />;
-  }
-
+function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-background">
       <div className="shrink-0">
@@ -59,48 +38,41 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
 function Router() {
   return (
     <Switch>
-      {/* Public routes */}
+      {/* Public portal — no sidebar */}
       <Route path="/" component={Portal} />
-      <Route path="/login" component={Login} />
 
-      {/* Resolucoes - nested to handle all sub-paths */}
+      {/* Resolucoes nested */}
       <Route path="/resolucoes" nest>
         {() => (
           <Switch>
-            {/* Admin-only: list, create, edit */}
             <Route path="/">
-              <AdminLayout><Resolucoes /></AdminLayout>
+              <AppLayout><Resolucoes /></AppLayout>
             </Route>
             <Route path="/nova">
-              <AdminLayout>
+              <AppLayout>
                 <ResolucaoForm params={{}} mode="create" />
-              </AdminLayout>
+              </AppLayout>
             </Route>
             <Route path="/:id/editar" nest>
               {({ params }) => (
-                <AdminLayout>
-                  <ResolucaoForm params={params as any} mode="edit" />
-                </AdminLayout>
+                <AppLayout>
+                  <ResolucaoForm params={params as Record<string, string>} mode="edit" />
+                </AppLayout>
               )}
             </Route>
-            {/* Public: detail view (any user can access) */}
             <Route path="/:id" component={ResolucaoDetalhe} />
           </Switch>
         )}
       </Route>
 
-      {/* Admin-only routes */}
       <Route path="/dashboard">
-        <AdminLayout><Dashboard /></AdminLayout>
-      </Route>
-      <Route path="/usuarios">
-        <AdminLayout><Usuarios /></AdminLayout>
+        <AppLayout><Dashboard /></AppLayout>
       </Route>
       <Route path="/relatorios">
-        <AdminLayout><Relatorios /></AdminLayout>
+        <AppLayout><Relatorios /></AppLayout>
       </Route>
       <Route path="/sincronizacao">
-        <AdminLayout><SincronizacaoDou /></AdminLayout>
+        <AppLayout><SincronizacaoDou /></AppLayout>
       </Route>
 
       <Route component={NotFound} />
@@ -112,12 +84,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AuthProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
-          <Toaster />
-        </AuthProvider>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <Router />
+        </WouterRouter>
+        <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
   );

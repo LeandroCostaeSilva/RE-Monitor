@@ -11,7 +11,7 @@ A professional Brazilian government web system for managing ANVISA Specific Reso
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
-- Required env: `SESSION_SECRET` — JWT signing secret (Replit secret)
+- `SESSION_SECRET` — kept for compatibility but auth is disabled; all routes are open
 
 ## Stack
 
@@ -37,19 +37,19 @@ A professional Brazilian government web system for managing ANVISA Specific Reso
 
 ## Architecture decisions
 
-- **JWT auth with `setAuthTokenGetter`**: The custom-fetch layer in `@workspace/api-client-react` auto-injects `Authorization: Bearer <token>` from localStorage via `setAuthTokenGetter` called once at app startup in `App.tsx`.
+- **No authentication**: All routes are open — no login required. Maintenance and data management are done directly via Replit.
 - **Soft delete**: REs use `deleted_at` column (never physically deleted); all queries filter `isNull(deleted_at)`.
-- **Audit log**: Every RE create/update/delete creates a record in `resolucoes_historico` with before/after JSON snapshots.
-- **No bcrypt**: Passwords hashed with SHA-256 via Node `crypto` to avoid native deps in esbuild bundle.
-- **Public portal + admin area**: The `/` route is a public search portal; `/dashboard`, `/resolucoes` (list/edit), `/usuarios`, `/relatorios` require auth and show sidebar layout.
+- **Audit log**: Every RE create/update/delete creates a record in `resolucoes_historico` with before/after JSON snapshots (alterado_por is null since there's no auth).
+- **No bcrypt**: Passwords hashed with SHA-256 via Node `crypto` — kept in schema but unused for UI auth.
+- **Unified layout**: All pages use the same sidebar layout. `/` is the public search portal; `/dashboard`, `/resolucoes`, `/relatorios`, `/sincronizacao` are accessible directly.
 
 ## Product
 
-- **Public portal** (`/`): searchable, filterable list of all REs with status badges; detail page accessible without login
+- **Portal** (`/`): searchable, filterable list of all REs with status badges; detail page with audit history
 - **Dashboard** (`/dashboard`): KPI stats, bar/pie charts by category and status, recent REs list
 - **RE management** (`/resolucoes`): full CRUD with search, multi-filter, sort, audit history
-- **User management** (`/usuarios`): create/edit/activate/deactivate users, role-based access (admin only)
 - **Reports** (`/relatorios`): monthly reports with charts, CSV/XLSX/PDF export
+- **DOU Sync** (`/sincronizacao`): manual sync trigger, AI-powered text import, backfill, sync history
 
 ## User preferences
 
@@ -60,9 +60,10 @@ A professional Brazilian government web system for managing ANVISA Specific Reso
 
 - After running codegen (`pnpm --filter @workspace/api-spec run codegen`), check `lib/api-zod/src/index.ts` — it must only contain `export * from "./generated/api";`
 - API server must be **restarted** after adding new routes (it runs a build step); use `restart_workflow "artifacts/api-server: API Server"`
-- Demo credentials: `admin@anvisa.gov.br` / `anvisa2026` (admin), `fiscal@anvisa.gov.br` / `fiscal2026` (fiscal)
+- No authentication on any route — all API endpoints are open
 - `tipo_acao` is stored as `text[]` array in PostgreSQL
 - Status enum: `vigente` (red), `revogada` (gray), `encerrada` (blue), `em_analise` (orange)
+- OpenAI model `gpt-5-mini` does NOT support `temperature` parameter — omit it
 
 ## Pointers
 

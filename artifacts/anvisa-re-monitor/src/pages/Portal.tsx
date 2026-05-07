@@ -54,11 +54,6 @@ export default function Portal() {
               <p className="text-xs opacity-75">Consulta Publica de Resolucoes Especificas</p>
             </div>
           </div>
-          <Link href="/login">
-            <Button variant="outline" size="sm" className="border-white/30 text-white bg-white/10 hover:bg-white/20">
-              Acesso Restrito
-            </Button>
-          </Link>
         </div>
       </header>
 

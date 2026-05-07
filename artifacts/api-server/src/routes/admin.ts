@@ -2,14 +2,13 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { syncLogsTable } from "@workspace/db";
 import { desc, sql } from "drizzle-orm";
-import { requireAuth, requirePerfil, type AuthRequest } from "../middlewares/auth";
 import { syncDOU, backfillDOU, parseAndImportText } from "../services/dou-sync";
 import { logger } from "../lib/logger";
 
 const router = Router();
 
 // GET /v1/admin/sync-logs - List sync history
-router.get("/v1/admin/sync-logs", requireAuth, requirePerfil("administrador", "admin"), async (req, res) => {
+router.get("/v1/admin/sync-logs", async (req, res) => {
   try {
     const limit = Math.min(100, parseInt(String(req.query["limit"] ?? "20")) || 20);
     const logs = await db.select().from(syncLogsTable).orderBy(desc(syncLogsTable.created_at)).limit(limit);
@@ -21,7 +20,7 @@ router.get("/v1/admin/sync-logs", requireAuth, requirePerfil("administrador", "a
 });
 
 // GET /v1/admin/sync-logs/latest - Get latest sync
-router.get("/v1/admin/sync-logs/latest", requireAuth, requirePerfil("administrador", "admin"), async (req, res) => {
+router.get("/v1/admin/sync-logs/latest", async (req, res) => {
   try {
     const [latest] = await db.select().from(syncLogsTable).orderBy(desc(syncLogsTable.created_at)).limit(1);
     res.json({ data: latest ?? null });
@@ -32,7 +31,7 @@ router.get("/v1/admin/sync-logs/latest", requireAuth, requirePerfil("administrad
 });
 
 // GET /v1/admin/sync-logs/:id - Get specific sync log
-router.get("/v1/admin/sync-logs/:id", requireAuth, requirePerfil("administrador", "admin"), async (req, res) => {
+router.get("/v1/admin/sync-logs/:id", async (req, res) => {
   try {
     const id = req.params["id"]!;
     const logs = await db.select().from(syncLogsTable).where(sql`${syncLogsTable.id} = ${id}`).limit(1);
@@ -49,7 +48,7 @@ router.get("/v1/admin/sync-logs/:id", requireAuth, requirePerfil("administrador"
 });
 
 // POST /v1/admin/sync-dou - Trigger sync for date range
-router.post("/v1/admin/sync-dou", requireAuth, requirePerfil("administrador", "admin"), async (req: AuthRequest, res) => {
+router.post("/v1/admin/sync-dou", async (req, res) => {
   const { date_from, date_to } = req.body as { date_from?: string; date_to?: string };
 
   const dateTo = date_to ? new Date(date_to) : new Date();
@@ -61,7 +60,7 @@ router.post("/v1/admin/sync-dou", requireAuth, requirePerfil("administrador", "a
   }
 
   if (dateFrom > dateTo) {
-    res.status(400).json({ message: "data_from deve ser anterior a date_to." });
+    res.status(400).json({ message: "date_from deve ser anterior a date_to." });
     return;
   }
 
@@ -72,17 +71,17 @@ router.post("/v1/admin/sync-dou", requireAuth, requirePerfil("administrador", "a
     return;
   }
 
-  req.log.info({ dateFrom, dateTo, userId: req.usuario?.id }, "Manual DOU sync triggered");
+  req.log.info({ dateFrom, dateTo }, "Manual DOU sync triggered");
 
   res.status(202).json({ message: "Sincronização iniciada", dateFrom: dateFrom.toISOString().slice(0, 10), dateTo: dateTo.toISOString().slice(0, 10) });
 
-  syncDOU({ dateFrom, dateTo, iniciado_por: req.usuario?.id }).catch((err: unknown) => {
+  syncDOU({ dateFrom, dateTo }).catch((err: unknown) => {
     logger.error({ err }, "Async DOU sync failed");
   });
 });
 
 // POST /v1/admin/sync-dou/backfill - Backfill from start date
-router.post("/v1/admin/sync-dou/backfill", requireAuth, requirePerfil("administrador", "admin"), async (req: AuthRequest, res) => {
+router.post("/v1/admin/sync-dou/backfill", async (req, res) => {
   const { start_date, end_date } = req.body as { start_date?: string; end_date?: string };
 
   const startDate = start_date ? new Date(start_date) : new Date("2020-01-01");
@@ -93,7 +92,7 @@ router.post("/v1/admin/sync-dou/backfill", requireAuth, requirePerfil("administr
     return;
   }
 
-  req.log.info({ startDate, endDate, userId: req.usuario?.id }, "Backfill DOU triggered");
+  req.log.info({ startDate, endDate }, "Backfill DOU triggered");
 
   res.status(202).json({
     message: "Backfill iniciado em background. Pode levar vários minutos.",
@@ -101,13 +100,13 @@ router.post("/v1/admin/sync-dou/backfill", requireAuth, requirePerfil("administr
     end_date: endDate.toISOString().slice(0, 10),
   });
 
-  backfillDOU({ startDate, endDate, iniciado_por: req.usuario?.id }).catch((err: unknown) => {
+  backfillDOU({ startDate, endDate }).catch((err: unknown) => {
     logger.error({ err }, "Backfill DOU failed");
   });
 });
 
 // POST /v1/admin/sync-dou/import-text - Import REs from pasted DOU text (AI parsing)
-router.post("/v1/admin/sync-dou/import-text", requireAuth, requirePerfil("administrador", "admin"), async (req: AuthRequest, res) => {
+router.post("/v1/admin/sync-dou/import-text", async (req, res) => {
   const { texto, data_referencia } = req.body as { texto?: string; data_referencia?: string };
 
   if (!texto || texto.trim().length < 50) {
@@ -121,11 +120,11 @@ router.post("/v1/admin/sync-dou/import-text", requireAuth, requirePerfil("admini
     return;
   }
 
-  req.log.info({ chars: texto.length, userId: req.usuario?.id }, "Manual text import triggered");
+  req.log.info({ chars: texto.length }, "Manual text import triggered");
 
   res.status(202).json({ message: "Importação iniciada. O texto será processado pela IA.", chars: texto.length });
 
-  parseAndImportText({ texto, dataReferencia: dataRef, iniciado_por: req.usuario?.id }).catch((err: unknown) => {
+  parseAndImportText({ texto, dataReferencia: dataRef }).catch((err: unknown) => {
     logger.error({ err }, "Text import failed");
   });
 });

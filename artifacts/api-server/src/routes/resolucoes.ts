@@ -6,7 +6,6 @@ import {
   usuariosTable,
 } from "@workspace/db";
 import { eq, and, or, ilike, isNull, gte, lte, sql, desc, asc } from "drizzle-orm";
-import { requireAuth, requirePerfil, type AuthRequest } from "../middlewares/auth";
 
 const router = Router();
 
@@ -133,7 +132,7 @@ router.get("/v1/resolucoes", async (req, res) => {
 });
 
 // POST /v1/resolucoes - Create new RE
-router.post("/v1/resolucoes", requireAuth, requirePerfil("administrador", "fiscal"), async (req: AuthRequest, res) => {
+router.post("/v1/resolucoes", async (req, res) => {
   try {
     const {
       numero_re,
@@ -185,7 +184,7 @@ router.post("/v1/resolucoes", requireAuth, requirePerfil("administrador", "fisca
         ementa,
         link_documento_oficial: link_documento_oficial || null,
         arquivo_pdf_path: arquivo_pdf_path || null,
-        criado_por: req.usuario?.id || null,
+        criado_por: null,
       })
       .returning();
 
@@ -193,8 +192,8 @@ router.post("/v1/resolucoes", requireAuth, requirePerfil("administrador", "fisca
     await db.insert(resolucoesHistoricoTable).values({
       resolucao_id: resolucao.id,
       justificativa: "Registro inicial da RE",
-      alterado_por: req.usuario?.id || null,
-      alterado_por_nome: req.usuario?.nome || null,
+      alterado_por: null,
+      alterado_por_nome: null,
       fonte: "MANUAL",
       dados_novos: resolucao,
     });
@@ -207,7 +206,7 @@ router.post("/v1/resolucoes", requireAuth, requirePerfil("administrador", "fisca
 });
 
 // GET /v1/resolucoes/exportar - Export results
-router.get("/v1/resolucoes/exportar", requireAuth, async (req, res) => {
+router.get("/v1/resolucoes/exportar", async (req, res) => {
   try {
     const { formato = "csv", q, status, tipo_produto, tipo_acao, data_inicio, data_fim } =
       req.query as Record<string, string>;
@@ -276,7 +275,7 @@ router.get("/v1/resolucoes/:id", async (req, res) => {
 });
 
 // PUT /v1/resolucoes/:id - Update RE
-router.put("/v1/resolucoes/:id", requireAuth, requirePerfil("administrador", "fiscal"), async (req: AuthRequest, res) => {
+router.put("/v1/resolucoes/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -334,8 +333,8 @@ router.put("/v1/resolucoes/:id", requireAuth, requirePerfil("administrador", "fi
     await db.insert(resolucoesHistoricoTable).values({
       resolucao_id: id,
       justificativa: justificativa_alteracao || "Atualização dos dados da RE",
-      alterado_por: req.usuario?.id || null,
-      alterado_por_nome: req.usuario?.nome || null,
+      alterado_por: null,
+      alterado_por_nome: null,
       fonte: "MANUAL",
       dados_anteriores: existing,
       dados_novos: updated,
@@ -349,7 +348,7 @@ router.put("/v1/resolucoes/:id", requireAuth, requirePerfil("administrador", "fi
 });
 
 // DELETE /v1/resolucoes/:id - Soft delete
-router.delete("/v1/resolucoes/:id", requireAuth, requirePerfil("administrador"), async (req: AuthRequest, res) => {
+router.delete("/v1/resolucoes/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -378,8 +377,8 @@ router.delete("/v1/resolucoes/:id", requireAuth, requirePerfil("administrador"),
       resolucao_id: id,
       campo_alterado: "deleted_at",
       justificativa: "Exclusão lógica da RE",
-      alterado_por: req.usuario?.id || null,
-      alterado_por_nome: req.usuario?.nome || null,
+      alterado_por: null,
+      alterado_por_nome: null,
       fonte: "MANUAL",
       dados_anteriores: existing,
     });
@@ -392,7 +391,7 @@ router.delete("/v1/resolucoes/:id", requireAuth, requirePerfil("administrador"),
 });
 
 // GET /v1/resolucoes/:id/historico - Version history
-router.get("/v1/resolucoes/:id/historico", requireAuth, async (req, res) => {
+router.get("/v1/resolucoes/:id/historico", async (req, res) => {
   try {
     const { id } = req.params;
 
