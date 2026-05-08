@@ -41,26 +41,16 @@ function Router() {
       {/* Public portal — no sidebar */}
       <Route path="/" component={Portal} />
 
-      {/* Resolucoes nested */}
-      <Route path="/resolucoes" nest>
-        {() => (
-          <Switch>
-            <Route path="/">
-              <AppLayout><Resolucoes /></AppLayout>
-            </Route>
-            <Route path="/nova">
-              <AppLayout>
-                <ResolucaoForm mode="create" />
-              </AppLayout>
-            </Route>
-            <Route path="/:id/editar">
-              <AppLayout>
-                <ResolucaoForm mode="edit" />
-              </AppLayout>
-            </Route>
-            <Route path="/:id" component={ResolucaoDetalhe} />
-          </Switch>
-        )}
+      {/* Resolucoes — flat routes, specific before generic */}
+      <Route path="/resolucoes/nova">
+        <AppLayout><ResolucaoForm mode="create" /></AppLayout>
+      </Route>
+      <Route path="/resolucoes/:id/editar">
+        <AppLayout><ResolucaoForm mode="edit" /></AppLayout>
+      </Route>
+      <Route path="/resolucoes/:id" component={ResolucaoDetalhe} />
+      <Route path="/resolucoes">
+        <AppLayout><Resolucoes /></AppLayout>
       </Route>
 
       <Route path="/dashboard">
