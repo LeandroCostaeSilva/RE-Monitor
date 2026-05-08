@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,7 +43,6 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 interface Props {
-  params: { id?: string };
   mode: "create" | "edit";
 }
 
@@ -56,11 +55,12 @@ const TIPOS_ACAO = [
   { id: "recolhimento", label: "Recolhimento Obrigatorio" },
 ];
 
-export default function ResolucaoForm({ params, mode }: Props) {
+export default function ResolucaoForm({ mode }: Props) {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const id = params.id;
+  const params = useParams<{ id: string }>();
+  const id = params?.id;
 
   const { data: existingRe } = useGetResolucao(id!, {
     query: { enabled: mode === "edit" && !!id, queryKey: ["resolucao", id!] },

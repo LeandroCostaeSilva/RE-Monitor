@@ -50,15 +50,13 @@ function Router() {
             </Route>
             <Route path="/nova">
               <AppLayout>
-                <ResolucaoForm params={{}} mode="create" />
+                <ResolucaoForm mode="create" />
               </AppLayout>
             </Route>
-            <Route path="/:id/editar" nest>
-              {({ params }) => (
-                <AppLayout>
-                  <ResolucaoForm params={params as Record<string, string>} mode="edit" />
-                </AppLayout>
-              )}
+            <Route path="/:id/editar">
+              <AppLayout>
+                <ResolucaoForm mode="edit" />
+              </AppLayout>
             </Route>
             <Route path="/:id" component={ResolucaoDetalhe} />
           </Switch>
