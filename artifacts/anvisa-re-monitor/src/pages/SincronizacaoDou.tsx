@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { RefreshCw, Play, Calendar, CheckCircle2, XCircle, AlertTriangle, Clock, Download, Database, Zap, FileText } from "lucide-react";
+import { RefreshCw, Play, Calendar, CheckCircle2, XCircle, AlertTriangle, Clock, Download, Database, Zap, FileText, Gavel, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -69,6 +69,156 @@ function duration(inicio: string, fim: string | null) {
   const secs = Math.round((new Date(fim).getTime() - new Date(inicio).getTime()) / 1000);
   if (secs < 60) return `${secs}s`;
   return `${Math.floor(secs / 60)}m ${secs % 60}s`;
+}
+
+interface DICOLSyncResult {
+  datas_varridas: number;
+  acordaos_encontrados: number;
+  acordaos_importados: number;
+  acordaos_ignorados: number;
+  erros: string[];
+  detalhes: Array<Record<string, unknown>>;
+}
+
+function DICOLSyncCard() {
+  const { toast } = useToast();
+  const today = new Date().toISOString().slice(0, 10);
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const [douFrom, setDouFrom] = useState(thirtyDaysAgo);
+  const [douTo, setDouTo] = useState(today);
+  const [lastResult, setLastResult] = useState<DICOLSyncResult | null>(null);
+
+  const dicolMutation = useMutation({
+    mutationFn: () =>
+      apiFetch("/api/v1/acordaos/sync-dou", {
+        method: "POST",
+        body: JSON.stringify({ data_inicio: douFrom, data_fim: douTo }),
+      }) as Promise<DICOLSyncResult>,
+    onSuccess: (result) => {
+      setLastResult(result);
+      if (result.acordaos_importados > 0) {
+        toast({
+          title: `${result.acordaos_importados} acórdão(s) DICOL importado(s)`,
+          description: `Varredura concluída: ${result.datas_varridas} dias varridos, ${result.acordaos_encontrados} encontrados.`,
+        });
+      } else {
+        toast({
+          title: "Varredura DICOL concluída",
+          description: `${result.datas_varridas} dias varridos. Nenhum acórdão novo encontrado.`,
+        });
+      }
+    },
+    onError: (err: Error) =>
+      toast({ title: "Erro na varredura DICOL", description: err.message, variant: "destructive" }),
+  });
+
+  return (
+    <Card className="border-amber-200 bg-amber-50/30">
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <Scale className="w-4 h-4 text-amber-600" />
+          Varredura DICOL — Acórdãos com Efeito Suspensivo
+        </CardTitle>
+        <CardDescription>
+          Varre o DOU em busca de acórdãos da Diretoria Colegiada que concedam efeito suspensivo a medidas
+          sanitárias (proibição, recolhimento, suspensão). Quando encontrados, registra automaticamente
+          nos metadados da RE correspondente e alerta o fiscal sanitário.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor="dicol-from" className="text-xs">Início da varredura</Label>
+            <Input
+              id="dicol-from"
+              type="date"
+              value={douFrom}
+              onChange={(e) => setDouFrom(e.target.value)}
+              className="mt-1"
+              max={today}
+            />
+          </div>
+          <div>
+            <Label htmlFor="dicol-to" className="text-xs">Fim da varredura</Label>
+            <Input
+              id="dicol-to"
+              type="date"
+              value={douTo}
+              onChange={(e) => setDouTo(e.target.value)}
+              className="mt-1"
+              max={today}
+            />
+          </div>
+        </div>
+
+        <div className="p-3 bg-amber-100 border border-amber-200 rounded text-xs text-amber-800 leading-relaxed">
+          <strong>Como funciona:</strong> O sistema busca no DOU todas as publicações da DICOL que mencionem
+          "efeito suspensivo", "medida preventiva" ou "Resolução-RE". Para cada acórdão encontrado, verifica
+          se a RE correspondente existe no banco e registra o acórdão no histórico de alterações da RE,
+          atualizando seu status para <em>Em Análise</em> quando há suspensão.
+        </div>
+
+        <Button
+          onClick={() => dicolMutation.mutate()}
+          disabled={dicolMutation.isPending}
+          className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+        >
+          {dicolMutation.isPending ? (
+            <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Varrendo DOU...</>
+          ) : (
+            <><Gavel className="w-4 h-4 mr-2" /> Iniciar Varredura DICOL</>
+          )}
+        </Button>
+
+        {lastResult && (
+          <div className="rounded border border-border bg-background p-4 space-y-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Resultado da última varredura</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+              <div className="p-2 bg-muted rounded">
+                <p className="text-lg font-bold text-foreground">{lastResult.datas_varridas}</p>
+                <p className="text-[10px] text-muted-foreground">Dias varridos</p>
+              </div>
+              <div className="p-2 bg-muted rounded">
+                <p className="text-lg font-bold text-foreground">{lastResult.acordaos_encontrados}</p>
+                <p className="text-[10px] text-muted-foreground">Encontrados</p>
+              </div>
+              <div className={`p-2 rounded ${lastResult.acordaos_importados > 0 ? "bg-green-100" : "bg-muted"}`}>
+                <p className={`text-lg font-bold ${lastResult.acordaos_importados > 0 ? "text-green-700" : "text-foreground"}`}>
+                  {lastResult.acordaos_importados}
+                </p>
+                <p className="text-[10px] text-muted-foreground">Importados</p>
+              </div>
+              <div className="p-2 bg-muted rounded">
+                <p className="text-lg font-bold text-foreground">{lastResult.acordaos_ignorados}</p>
+                <p className="text-[10px] text-muted-foreground">Ignorados</p>
+              </div>
+            </div>
+            {lastResult.detalhes.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-xs font-medium">Acórdãos importados:</p>
+                {lastResult.detalhes.map((d, i) => (
+                  <div key={i} className="text-xs flex items-center gap-2 text-muted-foreground">
+                    <Gavel className="w-3 h-3 text-amber-600 shrink-0" />
+                    <span>{String(d.numero_acordao)}</span>
+                    {d.efeito_suspensivo === true && (
+                      <Badge className="text-[9px] bg-amber-600 text-white">EFEITO SUSPENSIVO</Badge>
+                    )}
+                    <span className="font-mono">{String(d.data_publicacao_dou)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {lastResult.erros.length > 0 && (
+              <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded p-2">
+                <p className="font-semibold mb-1">{lastResult.erros.length} erro(s):</p>
+                {lastResult.erros.slice(0, 3).map((e, i) => <p key={i} className="font-mono">{e}</p>)}
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function SincronizacaoDou() {
@@ -308,6 +458,9 @@ export default function SincronizacaoDou() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Varredura DICOL — Acórdãos com Efeito Suspensivo */}
+      <DICOLSyncCard />
 
       {/* Como funciona */}
       <Card className="bg-muted/30">

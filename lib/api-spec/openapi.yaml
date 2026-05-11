@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: resolucoes
     description: Gestão de Resoluções Específicas
+  - name: acordaos
+    description: Acórdãos DICOL com efeito suspensivo
   - name: auth
     description: Autenticação e sessão
   - name: usuarios
@@ -316,6 +318,124 @@ paths:
                   $ref: "#/components/schemas/HistoricoEntry"
         "404":
           description: RE não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/resolucoes/{id}/acordaos:
+    get:
+      operationId: listAcordaosByResolucao
+      tags: [acordaos]
+      summary: Listar acórdãos DICOL vinculados a uma RE
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de acórdãos da RE
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AcordaoDicol"
+        "404":
+          description: RE não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    post:
+      operationId: createAcordao
+      tags: [acordaos]
+      summary: Registrar acórdão DICOL para uma RE
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAcordaoBody"
+      responses:
+        "201":
+          description: Acórdão registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcordaoDicol"
+        "400":
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: RE não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/resolucoes/{resolucaoId}/acordaos/{acordaoId}:
+    delete:
+      operationId: deleteAcordao
+      tags: [acordaos]
+      summary: Remover acórdão DICOL
+      parameters:
+        - name: resolucaoId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: acordaoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Acórdão removido com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/acordaos/sync-dou:
+    post:
+      operationId: syncAcordaosDou
+      tags: [acordaos]
+      summary: Varrer o DOU em busca de acórdãos DICOL publicados
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyncAcordaosBody"
+      responses:
+        "200":
+          description: Resultado da varredura
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyncAcordaosResult"
+        "500":
+          description: Erro interno
           content:
             application/json:
               schema:
@@ -1057,3 +1177,130 @@ components:
       required:
         - id
         - nome
+
+    AcordaoDicol:
+      type: object
+      properties:
+        id:
+          type: string
+        resolucao_id:
+          type: string
+        numero_acordao:
+          type: string
+          description: "Ex: Acórdão nº 23/2025-DICOL"
+        numero_processo:
+          type: ["string", "null"]
+          description: "Número do processo administrativo (ex: 25351.123456/2025-12)"
+        data_publicacao_dou:
+          type: string
+          description: "Data de publicação no DOU (YYYY-MM-DD)"
+        data_decisao:
+          type: ["string", "null"]
+          description: "Data da decisão da DICOL (YYYY-MM-DD)"
+        efeito_suspensivo:
+          type: boolean
+          description: "Se a DICOL conferiu efeito suspensivo à medida sanitária"
+        tipo_decisao:
+          type: ["string", "null"]
+          description: "provimento | improvimento | provimento_parcial | liminar_suspensiva"
+        sumario_decisao:
+          type: ["string", "null"]
+          description: "Sumário/ementa da decisão colegiada"
+        relator:
+          type: ["string", "null"]
+          description: "Diretor relator do recurso"
+        link_dou:
+          type: ["string", "null"]
+          description: "Link para o DOU onde o acórdão foi publicado"
+        numero_dou_edicao:
+          type: ["string", "null"]
+        secao_dou:
+          type: ["integer", "null"]
+        pagina_dou:
+          type: ["integer", "null"]
+        origem_dado:
+          type: ["string", "null"]
+          description: "MANUAL | DOU_SCAN"
+        created_at:
+          type: string
+        updated_at:
+          type: string
+      required:
+        - id
+        - resolucao_id
+        - numero_acordao
+        - data_publicacao_dou
+        - efeito_suspensivo
+        - created_at
+        - updated_at
+
+    CreateAcordaoBody:
+      type: object
+      properties:
+        numero_acordao:
+          type: string
+        numero_processo:
+          type: ["string", "null"]
+        data_publicacao_dou:
+          type: string
+        data_decisao:
+          type: ["string", "null"]
+        efeito_suspensivo:
+          type: boolean
+        tipo_decisao:
+          type: ["string", "null"]
+        sumario_decisao:
+          type: ["string", "null"]
+        relator:
+          type: ["string", "null"]
+        link_dou:
+          type: ["string", "null"]
+        numero_dou_edicao:
+          type: ["string", "null"]
+        secao_dou:
+          type: ["integer", "null"]
+        pagina_dou:
+          type: ["integer", "null"]
+        atualizar_status_re:
+          type: ["boolean", "null"]
+          description: "Se true e efeito_suspensivo=true, atualiza status da RE para em_analise"
+      required:
+        - numero_acordao
+        - data_publicacao_dou
+        - efeito_suspensivo
+
+    SyncAcordaosBody:
+      type: object
+      properties:
+        data_inicio:
+          type: ["string", "null"]
+          description: "Data início da varredura (YYYY-MM-DD, default: 30 dias atrás)"
+        data_fim:
+          type: ["string", "null"]
+          description: "Data fim da varredura (YYYY-MM-DD, default: hoje)"
+
+    SyncAcordaosResult:
+      type: object
+      properties:
+        datas_varridas:
+          type: integer
+        acordaos_encontrados:
+          type: integer
+        acordaos_importados:
+          type: integer
+        acordaos_ignorados:
+          type: integer
+        erros:
+          type: array
+          items:
+            type: string
+        detalhes:
+          type: array
+          items:
+            type: object
+      required:
+        - datas_varridas
+        - acordaos_encontrados
+        - acordaos_importados
+        - acordaos_ignorados
+        - erros

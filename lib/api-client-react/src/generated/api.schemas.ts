@@ -259,6 +259,113 @@ export interface TipoAcao {
   descricao?: string | null;
 }
 
+export interface AcordaoDicol {
+  id: string;
+  resolucao_id: string;
+  /** Ex: Acórdão nº 23/2025-DICOL */
+  numero_acordao: string;
+  /**
+   * Número do processo administrativo (ex: 25351.123456/2025-12)
+   * @nullable
+   */
+  numero_processo?: string | null;
+  /** Data de publicação no DOU (YYYY-MM-DD) */
+  data_publicacao_dou: string;
+  /**
+   * Data da decisão da DICOL (YYYY-MM-DD)
+   * @nullable
+   */
+  data_decisao?: string | null;
+  /** Se a DICOL conferiu efeito suspensivo à medida sanitária */
+  efeito_suspensivo: boolean;
+  /**
+   * provimento | improvimento | provimento_parcial | liminar_suspensiva
+   * @nullable
+   */
+  tipo_decisao?: string | null;
+  /**
+   * Sumário/ementa da decisão colegiada
+   * @nullable
+   */
+  sumario_decisao?: string | null;
+  /**
+   * Diretor relator do recurso
+   * @nullable
+   */
+  relator?: string | null;
+  /**
+   * Link para o DOU onde o acórdão foi publicado
+   * @nullable
+   */
+  link_dou?: string | null;
+  /** @nullable */
+  numero_dou_edicao?: string | null;
+  /** @nullable */
+  secao_dou?: number | null;
+  /** @nullable */
+  pagina_dou?: number | null;
+  /**
+   * MANUAL | DOU_SCAN
+   * @nullable
+   */
+  origem_dado?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateAcordaoBody {
+  numero_acordao: string;
+  /** @nullable */
+  numero_processo?: string | null;
+  data_publicacao_dou: string;
+  /** @nullable */
+  data_decisao?: string | null;
+  efeito_suspensivo: boolean;
+  /** @nullable */
+  tipo_decisao?: string | null;
+  /** @nullable */
+  sumario_decisao?: string | null;
+  /** @nullable */
+  relator?: string | null;
+  /** @nullable */
+  link_dou?: string | null;
+  /** @nullable */
+  numero_dou_edicao?: string | null;
+  /** @nullable */
+  secao_dou?: number | null;
+  /** @nullable */
+  pagina_dou?: number | null;
+  /**
+   * Se true e efeito_suspensivo=true, atualiza status da RE para em_analise
+   * @nullable
+   */
+  atualizar_status_re?: boolean | null;
+}
+
+export interface SyncAcordaosBody {
+  /**
+   * Data início da varredura (YYYY-MM-DD, default: 30 dias atrás)
+   * @nullable
+   */
+  data_inicio?: string | null;
+  /**
+   * Data fim da varredura (YYYY-MM-DD, default: hoje)
+   * @nullable
+   */
+  data_fim?: string | null;
+}
+
+export type SyncAcordaosResultDetalhesItem = { [key: string]: unknown };
+
+export interface SyncAcordaosResult {
+  datas_varridas: number;
+  acordaos_encontrados: number;
+  acordaos_importados: number;
+  acordaos_ignorados: number;
+  erros: string[];
+  detalhes?: SyncAcordaosResultDetalhesItem[];
+}
+
 export type ListResolucoesParams = {
   /**
    * Busca full-text (nome do produto, princípio ativo, fabricante, ementa)

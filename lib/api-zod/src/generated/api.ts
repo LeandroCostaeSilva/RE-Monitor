@@ -252,6 +252,120 @@ export const GetResolucaoHistoricoResponse = zod.array(
 );
 
 /**
+ * @summary Listar acórdãos DICOL vinculados a uma RE
+ */
+export const ListAcordaosByResolucaoParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const ListAcordaosByResolucaoResponseItem = zod.object({
+  id: zod.string(),
+  resolucao_id: zod.string(),
+  numero_acordao: zod.string().describe("Ex: Acórdão nº 23\/2025-DICOL"),
+  numero_processo: zod
+    .string()
+    .nullish()
+    .describe("Número do processo administrativo (ex: 25351.123456\/2025-12)"),
+  data_publicacao_dou: zod
+    .string()
+    .describe("Data de publicação no DOU (YYYY-MM-DD)"),
+  data_decisao: zod
+    .string()
+    .nullish()
+    .describe("Data da decisão da DICOL (YYYY-MM-DD)"),
+  efeito_suspensivo: zod
+    .boolean()
+    .describe("Se a DICOL conferiu efeito suspensivo à medida sanitária"),
+  tipo_decisao: zod
+    .string()
+    .nullish()
+    .describe(
+      "provimento | improvimento | provimento_parcial | liminar_suspensiva",
+    ),
+  sumario_decisao: zod
+    .string()
+    .nullish()
+    .describe("Sumário\/ementa da decisão colegiada"),
+  relator: zod.string().nullish().describe("Diretor relator do recurso"),
+  link_dou: zod
+    .string()
+    .nullish()
+    .describe("Link para o DOU onde o acórdão foi publicado"),
+  numero_dou_edicao: zod.string().nullish(),
+  secao_dou: zod.number().nullish(),
+  pagina_dou: zod.number().nullish(),
+  origem_dado: zod.string().nullish().describe("MANUAL | DOU_SCAN"),
+  created_at: zod.string(),
+  updated_at: zod.string(),
+});
+export const ListAcordaosByResolucaoResponse = zod.array(
+  ListAcordaosByResolucaoResponseItem,
+);
+
+/**
+ * @summary Registrar acórdão DICOL para uma RE
+ */
+export const CreateAcordaoParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const CreateAcordaoBody = zod.object({
+  numero_acordao: zod.string(),
+  numero_processo: zod.string().nullish(),
+  data_publicacao_dou: zod.string(),
+  data_decisao: zod.string().nullish(),
+  efeito_suspensivo: zod.boolean(),
+  tipo_decisao: zod.string().nullish(),
+  sumario_decisao: zod.string().nullish(),
+  relator: zod.string().nullish(),
+  link_dou: zod.string().nullish(),
+  numero_dou_edicao: zod.string().nullish(),
+  secao_dou: zod.number().nullish(),
+  pagina_dou: zod.number().nullish(),
+  atualizar_status_re: zod
+    .boolean()
+    .nullish()
+    .describe(
+      "Se true e efeito_suspensivo=true, atualiza status da RE para em_analise",
+    ),
+});
+
+/**
+ * @summary Remover acórdão DICOL
+ */
+export const DeleteAcordaoParams = zod.object({
+  resolucaoId: zod.coerce.string(),
+  acordaoId: zod.coerce.string(),
+});
+
+export const DeleteAcordaoResponse = zod.object({
+  message: zod.string(),
+});
+
+/**
+ * @summary Varrer o DOU em busca de acórdãos DICOL publicados
+ */
+export const SyncAcordaosDouBody = zod.object({
+  data_inicio: zod
+    .string()
+    .nullish()
+    .describe("Data início da varredura (YYYY-MM-DD, default: 30 dias atrás)"),
+  data_fim: zod
+    .string()
+    .nullish()
+    .describe("Data fim da varredura (YYYY-MM-DD, default: hoje)"),
+});
+
+export const SyncAcordaosDouResponse = zod.object({
+  datas_varridas: zod.number(),
+  acordaos_encontrados: zod.number(),
+  acordaos_importados: zod.number(),
+  acordaos_ignorados: zod.number(),
+  erros: zod.array(zod.string()),
+  detalhes: zod.array(zod.object({}).passthrough()).optional(),
+});
+
+/**
  * @summary Autenticação e emissão de token JWT
  */
 export const LoginBody = zod.object({

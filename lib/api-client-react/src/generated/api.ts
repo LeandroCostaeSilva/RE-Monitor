@@ -17,9 +17,11 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  AcordaoDicol,
   AuthResponse,
   Categoria,
   CategoriaCount,
+  CreateAcordaoBody,
   CreateResolucaoBody,
   CreateUsuarioBody,
   DashboardStats,
@@ -40,6 +42,8 @@ import type {
   ResolucaoResumida,
   StatusCount,
   SuccessResponse,
+  SyncAcordaosBody,
+  SyncAcordaosResult,
   TipoAcao,
   UpdateResolucaoBody,
   UpdateUsuarioBody,
@@ -753,6 +757,356 @@ export function useGetResolucaoHistorico<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary Listar acórdãos DICOL vinculados a uma RE
+ */
+export const getListAcordaosByResolucaoUrl = (id: string) => {
+  return `/api/v1/resolucoes/${id}/acordaos`;
+};
+
+export const listAcordaosByResolucao = async (
+  id: string,
+  options?: RequestInit,
+): Promise<AcordaoDicol[]> => {
+  return customFetch<AcordaoDicol[]>(getListAcordaosByResolucaoUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListAcordaosByResolucaoQueryKey = (id: string) => {
+  return [`/api/v1/resolucoes/${id}/acordaos`] as const;
+};
+
+export const getListAcordaosByResolucaoQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAcordaosByResolucao>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listAcordaosByResolucao>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAcordaosByResolucaoQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAcordaosByResolucao>>
+  > = ({ signal }) =>
+    listAcordaosByResolucao(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAcordaosByResolucao>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListAcordaosByResolucaoQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAcordaosByResolucao>>
+>;
+export type ListAcordaosByResolucaoQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Listar acórdãos DICOL vinculados a uma RE
+ */
+
+export function useListAcordaosByResolucao<
+  TData = Awaited<ReturnType<typeof listAcordaosByResolucao>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listAcordaosByResolucao>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListAcordaosByResolucaoQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Registrar acórdão DICOL para uma RE
+ */
+export const getCreateAcordaoUrl = (id: string) => {
+  return `/api/v1/resolucoes/${id}/acordaos`;
+};
+
+export const createAcordao = async (
+  id: string,
+  createAcordaoBody: CreateAcordaoBody,
+  options?: RequestInit,
+): Promise<AcordaoDicol> => {
+  return customFetch<AcordaoDicol>(getCreateAcordaoUrl(id), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createAcordaoBody),
+  });
+};
+
+export const getCreateAcordaoMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createAcordao>>,
+    TError,
+    { id: string; data: BodyType<CreateAcordaoBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createAcordao>>,
+  TError,
+  { id: string; data: BodyType<CreateAcordaoBody> },
+  TContext
+> => {
+  const mutationKey = ["createAcordao"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createAcordao>>,
+    { id: string; data: BodyType<CreateAcordaoBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return createAcordao(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateAcordaoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createAcordao>>
+>;
+export type CreateAcordaoMutationBody = BodyType<CreateAcordaoBody>;
+export type CreateAcordaoMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Registrar acórdão DICOL para uma RE
+ */
+export const useCreateAcordao = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createAcordao>>,
+    TError,
+    { id: string; data: BodyType<CreateAcordaoBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createAcordao>>,
+  TError,
+  { id: string; data: BodyType<CreateAcordaoBody> },
+  TContext
+> => {
+  return useMutation(getCreateAcordaoMutationOptions(options));
+};
+
+/**
+ * @summary Remover acórdão DICOL
+ */
+export const getDeleteAcordaoUrl = (resolucaoId: string, acordaoId: string) => {
+  return `/api/v1/resolucoes/${resolucaoId}/acordaos/${acordaoId}`;
+};
+
+export const deleteAcordao = async (
+  resolucaoId: string,
+  acordaoId: string,
+  options?: RequestInit,
+): Promise<SuccessResponse> => {
+  return customFetch<SuccessResponse>(
+    getDeleteAcordaoUrl(resolucaoId, acordaoId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+export const getDeleteAcordaoMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteAcordao>>,
+    TError,
+    { resolucaoId: string; acordaoId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteAcordao>>,
+  TError,
+  { resolucaoId: string; acordaoId: string },
+  TContext
+> => {
+  const mutationKey = ["deleteAcordao"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteAcordao>>,
+    { resolucaoId: string; acordaoId: string }
+  > = (props) => {
+    const { resolucaoId, acordaoId } = props ?? {};
+
+    return deleteAcordao(resolucaoId, acordaoId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteAcordaoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteAcordao>>
+>;
+
+export type DeleteAcordaoMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Remover acórdão DICOL
+ */
+export const useDeleteAcordao = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteAcordao>>,
+    TError,
+    { resolucaoId: string; acordaoId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteAcordao>>,
+  TError,
+  { resolucaoId: string; acordaoId: string },
+  TContext
+> => {
+  return useMutation(getDeleteAcordaoMutationOptions(options));
+};
+
+/**
+ * @summary Varrer o DOU em busca de acórdãos DICOL publicados
+ */
+export const getSyncAcordaosDouUrl = () => {
+  return `/api/v1/acordaos/sync-dou`;
+};
+
+export const syncAcordaosDou = async (
+  syncAcordaosBody?: SyncAcordaosBody,
+  options?: RequestInit,
+): Promise<SyncAcordaosResult> => {
+  return customFetch<SyncAcordaosResult>(getSyncAcordaosDouUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(syncAcordaosBody),
+  });
+};
+
+export const getSyncAcordaosDouMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof syncAcordaosDou>>,
+    TError,
+    { data: BodyType<SyncAcordaosBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof syncAcordaosDou>>,
+  TError,
+  { data: BodyType<SyncAcordaosBody> },
+  TContext
+> => {
+  const mutationKey = ["syncAcordaosDou"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof syncAcordaosDou>>,
+    { data: BodyType<SyncAcordaosBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return syncAcordaosDou(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SyncAcordaosDouMutationResult = NonNullable<
+  Awaited<ReturnType<typeof syncAcordaosDou>>
+>;
+export type SyncAcordaosDouMutationBody = BodyType<SyncAcordaosBody>;
+export type SyncAcordaosDouMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Varrer o DOU em busca de acórdãos DICOL publicados
+ */
+export const useSyncAcordaosDou = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof syncAcordaosDou>>,
+    TError,
+    { data: BodyType<SyncAcordaosBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof syncAcordaosDou>>,
+  TError,
+  { data: BodyType<SyncAcordaosBody> },
+  TContext
+> => {
+  return useMutation(getSyncAcordaosDouMutationOptions(options));
+};
 
 /**
  * @summary Autenticação e emissão de token JWT

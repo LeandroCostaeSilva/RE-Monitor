@@ -43,7 +43,7 @@ export default function Relatorios() {
 
   const exportMutation = useExportarResolucoes(
     { formato: exportFormat },
-    { query: { enabled: false } }
+    { query: { queryKey: ["exportar", exportFormat], enabled: false } }
   );
 
   const anos = Array.from({ length: 5 }, (_, i) => String(now.getFullYear() - i));
