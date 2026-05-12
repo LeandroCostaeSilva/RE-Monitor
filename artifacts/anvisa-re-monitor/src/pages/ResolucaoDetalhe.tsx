@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation, useParams } from "wouter";
 import {
-  ArrowLeft, ExternalLink, Clock, FileText, AlertTriangle, Shield,
+  ArrowLeft, ExternalLink, Clock, FileText, AlertTriangle,
   Gavel, ChevronDown, ChevronUp, Plus, Trash2, Scale,
 } from "lucide-react";
 import {
@@ -292,8 +292,8 @@ export default function ResolucaoDetalhe() {
       {/* Header */}
       <header className="bg-primary text-primary-foreground shadow-md">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Shield className="w-6 h-6" />
-          <span className="font-semibold text-sm">ANVISA-RE Monitor</span>
+          <img src="/logo.png" alt="RE Monitor Logo" className="w-6 h-6 object-contain" />
+          <span className="font-bold text-sm tracking-wide">RE MONITOR</span>
         </div>
       </header>
 
