@@ -610,11 +610,6 @@ export default function ResolucaoDetalhe() {
           </div>
         </div>
 
-        <div className="flex justify-end mt-4">
-          <a href={`/resolucoes/${re.id}/editar`}>
-            <Button variant="outline" size="sm">Editar esta RE</Button>
-          </a>
-        </div>
       </div>
     </div>
   );
