@@ -82,7 +82,7 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
         <div>
           <Label className="text-sm">Número do Acórdão *</Label>
           <Input
-            className="mt-1 text-base"
+            className="mt-1 text-sm"
             placeholder="Acórdão nº 23/2025-DICOL"
             value={form.numero_acordao}
             onChange={(e) => field("numero_acordao", e.target.value)}
@@ -92,7 +92,7 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
         <div>
           <Label className="text-sm">Número do Processo</Label>
           <Input
-            className="mt-1 text-base"
+            className="mt-1 text-sm"
             placeholder="25351.123456/2025-12"
             value={form.numero_processo ?? ""}
             onChange={(e) => field("numero_processo", e.target.value)}
@@ -102,7 +102,7 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
           <Label className="text-sm">Data de Publicação DOU *</Label>
           <Input
             type="date"
-            className="mt-1 text-base"
+            className="mt-1 text-sm"
             value={form.data_publicacao_dou}
             onChange={(e) => field("data_publicacao_dou", e.target.value)}
             required
@@ -112,7 +112,7 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
           <Label className="text-sm">Data da Decisão</Label>
           <Input
             type="date"
-            className="mt-1 text-base"
+            className="mt-1 text-sm"
             value={form.data_decisao ?? ""}
             onChange={(e) => field("data_decisao", e.target.value)}
           />
@@ -120,7 +120,7 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
         <div>
           <Label className="text-sm">Tipo de Decisão</Label>
           <select
-            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-base"
+            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             value={form.tipo_decisao ?? "provimento"}
             onChange={(e) => field("tipo_decisao", e.target.value)}
           >
@@ -133,7 +133,7 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
         <div>
           <Label className="text-sm">Relator</Label>
           <Input
-            className="mt-1 text-base"
+            className="mt-1 text-sm"
             placeholder="Nome do Diretor Relator"
             value={form.relator ?? ""}
             onChange={(e) => field("relator", e.target.value)}
@@ -142,7 +142,7 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
         <div className="sm:col-span-2">
           <Label className="text-sm">Link DOU</Label>
           <Input
-            className="mt-1 text-base"
+            className="mt-1 text-sm"
             placeholder="https://www.in.gov.br/web/dou/-/..."
             value={form.link_dou ?? ""}
             onChange={(e) => field("link_dou", e.target.value)}
@@ -151,7 +151,7 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
         <div className="sm:col-span-2">
           <Label className="text-sm">Sumário / Ementa da Decisão</Label>
           <textarea
-            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-base resize-y"
+            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-y"
             rows={3}
             placeholder="Resumo da decisão da DICOL..."
             value={form.sumario_decisao ?? ""}
@@ -169,7 +169,7 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
           className="mt-0.5 w-4 h-4"
         />
         <div>
-          <label htmlFor="efeito_suspensivo" className="text-base font-semibold text-amber-900 cursor-pointer">
+          <label htmlFor="efeito_suspensivo" className="text-sm font-semibold text-amber-900 cursor-pointer">
             Efeito Suspensivo conferido pela DICOL
           </label>
           <p className="text-sm text-amber-700 mt-0.5">
@@ -187,7 +187,7 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
             onChange={(e) => field("atualizar_status_re", e.target.checked)}
             className="mt-0.5 w-4 h-4"
           />
-          <label htmlFor="atualizar_status" className="text-base text-blue-800 cursor-pointer">
+          <label htmlFor="atualizar_status" className="text-sm text-blue-800 cursor-pointer">
             Atualizar status da RE para <strong>Em Análise</strong> (medida suspensa por decisão DICOL)
           </label>
         </div>
@@ -296,7 +296,7 @@ export default function ResolucaoDetalhe() {
             <img src="/logo.png" alt="RE Monitor Logo" className="w-6 h-6 object-contain" />
           </div>
           <div>
-            <p className="font-bold text-base tracking-wide text-white">RE MONITOR</p>
+            <p className="font-bold text-sm tracking-wide text-white">RE MONITOR</p>
             <p className="text-blue-200 leading-tight" style={{ fontSize: "9px" }}>Consulta Pública de Resoluções - RE ANVISA publicadas em DOU</p>
           </div>
         </div>
@@ -304,7 +304,7 @@ export default function ResolucaoDetalhe() {
 
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Back */}
-        <a href="/" className="flex items-center gap-2 text-base text-muted-foreground hover:text-foreground mb-6 transition-colors w-fit">
+        <a href="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors w-fit">
           <ArrowLeft className="w-4 h-4" />
           Voltar ao Portal
         </a>
@@ -316,7 +316,7 @@ export default function ResolucaoDetalhe() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <Badge className="bg-amber-600 text-white text-sm">EFEITO SUSPENSIVO</Badge>
-                <span className="text-base font-bold text-amber-900">
+                <span className="text-sm font-bold text-amber-900">
                   Medida suspensa por decisão da DICOL / Diretoria Colegiada
                 </span>
               </div>
@@ -358,10 +358,10 @@ export default function ResolucaoDetalhe() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <StatusBadge status={re.status} />
-              {re.status === "vigente" && <span className="text-base font-semibold text-red-700">Esta resolucao esta em vigor</span>}
-              {re.status === "em_analise" && <span className="text-base font-semibold text-orange-700">Esta resolucao esta em analise</span>}
-              {re.status === "revogada" && <span className="text-base font-semibold text-gray-600">Esta resolucao foi revogada</span>}
-              {re.status === "encerrada" && <span className="text-base font-semibold text-blue-700">Esta resolucao foi encerrada</span>}
+              {re.status === "vigente" && <span className="text-sm font-semibold text-red-700">Esta resolucao esta em vigor</span>}
+              {re.status === "em_analise" && <span className="text-sm font-semibold text-orange-700">Esta resolucao esta em analise</span>}
+              {re.status === "revogada" && <span className="text-sm font-semibold text-gray-600">Esta resolucao foi revogada</span>}
+              {re.status === "encerrada" && <span className="text-sm font-semibold text-blue-700">Esta resolucao foi encerrada</span>}
             </div>
             <div className="flex flex-wrap gap-1 mt-2">
               {re.tipo_acao?.map((acao) => (
@@ -385,7 +385,7 @@ export default function ResolucaoDetalhe() {
             <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5" /> Ementa / Motivacao
             </p>
-            <p className="text-base text-foreground leading-relaxed">{re.ementa}</p>
+            <p className="text-sm text-foreground leading-relaxed">{re.ementa}</p>
           </div>
 
           {/* Fields grid */}
@@ -393,7 +393,7 @@ export default function ResolucaoDetalhe() {
             {fields.map((field) => (
               <div key={field.label} className="px-6 py-3 border-b border-border">
                 <p className="text-sm text-muted-foreground mb-0.5">{field.label}</p>
-                <p className="text-base font-medium text-foreground capitalize">{field.value}</p>
+                <p className="text-sm font-medium text-foreground capitalize">{field.value}</p>
               </div>
             ))}
           </div>
@@ -405,7 +405,7 @@ export default function ResolucaoDetalhe() {
                 href={re.link_documento_oficial}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 text-base text-primary hover:underline"
+                className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
               >
                 <ExternalLink className="w-4 h-4" />
                 Ver documento oficial no DOU/ANVISA
@@ -419,7 +419,7 @@ export default function ResolucaoDetalhe() {
           <div className="px-6 py-4 border-b border-border flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Gavel className="w-4 h-4 text-amber-600" />
-              <h2 className="font-semibold text-base">Acórdãos da Diretoria Colegiada (DICOL)</h2>
+              <h2 className="font-semibold text-sm">Acórdãos da Diretoria Colegiada (DICOL)</h2>
               {acordaos && acordaos.length > 0 && (
                 <Badge variant="outline" className="text-sm">{acordaos.length}</Badge>
               )}
@@ -443,7 +443,7 @@ export default function ResolucaoDetalhe() {
             {acordaosLoading ? (
               <div className="space-y-2">{[...Array(2)].map((_, i) => <Skeleton key={i} className="h-16" />)}</div>
             ) : !acordaos || acordaos.length === 0 ? (
-              <p className="text-base text-muted-foreground py-2">
+              <p className="text-sm text-muted-foreground py-2">
                 Nenhum acórdão DICOL registrado para esta RE, no sistema. Caso possuir dados de atualização,
                 insira manualmente em "Registrar Acórdão". As informações serão validadas pelo administrador.
               </p>
@@ -461,7 +461,7 @@ export default function ResolucaoDetalhe() {
                     <div className="flex items-start justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-2 flex-wrap">
                         <Gavel className={`w-4 h-4 shrink-0 ${ac.efeito_suspensivo ? "text-amber-600" : "text-muted-foreground"}`} />
-                        <span className="font-semibold text-base">{ac.numero_acordao}</span>
+                        <span className="font-semibold text-sm">{ac.numero_acordao}</span>
                         {ac.efeito_suspensivo && (
                           <Badge className="bg-amber-600 text-white text-[10px]">EFEITO SUSPENSIVO</Badge>
                         )}
@@ -533,7 +533,7 @@ export default function ResolucaoDetalhe() {
         <div className="bg-card border border-border rounded-lg overflow-hidden">
           <div className="px-6 py-4 border-b border-border flex items-center gap-2">
             <Clock className="w-4 h-4 text-muted-foreground" />
-            <h2 className="font-semibold text-base">Historico de Alteracoes</h2>
+            <h2 className="font-semibold text-sm">Historico de Alteracoes</h2>
           </div>
           <div className="px-6 py-4">
             {historicoLoading ? (
@@ -541,7 +541,7 @@ export default function ResolucaoDetalhe() {
                 {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16" />)}
               </div>
             ) : historico?.length === 0 ? (
-              <p className="text-base text-muted-foreground">Nenhuma alteracao registrada.</p>
+              <p className="text-sm text-muted-foreground">Nenhuma alteracao registrada.</p>
             ) : (
               <div className="space-y-4">
                 {historico?.map((entry, idx) => {
