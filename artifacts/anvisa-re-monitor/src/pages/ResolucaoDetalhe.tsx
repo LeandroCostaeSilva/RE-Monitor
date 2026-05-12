@@ -77,12 +77,12 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 border border-border rounded-lg p-4 bg-muted/20">
-      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Novo Acórdão DICOL</p>
+      <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Novo Acórdão DICOL</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <Label className="text-xs">Número do Acórdão *</Label>
+          <Label className="text-sm">Número do Acórdão *</Label>
           <Input
-            className="mt-1 text-sm"
+            className="mt-1 text-base"
             placeholder="Acórdão nº 23/2025-DICOL"
             value={form.numero_acordao}
             onChange={(e) => field("numero_acordao", e.target.value)}
@@ -90,37 +90,37 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
           />
         </div>
         <div>
-          <Label className="text-xs">Número do Processo</Label>
+          <Label className="text-sm">Número do Processo</Label>
           <Input
-            className="mt-1 text-sm"
+            className="mt-1 text-base"
             placeholder="25351.123456/2025-12"
             value={form.numero_processo ?? ""}
             onChange={(e) => field("numero_processo", e.target.value)}
           />
         </div>
         <div>
-          <Label className="text-xs">Data de Publicação DOU *</Label>
+          <Label className="text-sm">Data de Publicação DOU *</Label>
           <Input
             type="date"
-            className="mt-1 text-sm"
+            className="mt-1 text-base"
             value={form.data_publicacao_dou}
             onChange={(e) => field("data_publicacao_dou", e.target.value)}
             required
           />
         </div>
         <div>
-          <Label className="text-xs">Data da Decisão</Label>
+          <Label className="text-sm">Data da Decisão</Label>
           <Input
             type="date"
-            className="mt-1 text-sm"
+            className="mt-1 text-base"
             value={form.data_decisao ?? ""}
             onChange={(e) => field("data_decisao", e.target.value)}
           />
         </div>
         <div>
-          <Label className="text-xs">Tipo de Decisão</Label>
+          <Label className="text-sm">Tipo de Decisão</Label>
           <select
-            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-base"
             value={form.tipo_decisao ?? "provimento"}
             onChange={(e) => field("tipo_decisao", e.target.value)}
           >
@@ -131,27 +131,27 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
           </select>
         </div>
         <div>
-          <Label className="text-xs">Relator</Label>
+          <Label className="text-sm">Relator</Label>
           <Input
-            className="mt-1 text-sm"
+            className="mt-1 text-base"
             placeholder="Nome do Diretor Relator"
             value={form.relator ?? ""}
             onChange={(e) => field("relator", e.target.value)}
           />
         </div>
         <div className="sm:col-span-2">
-          <Label className="text-xs">Link DOU</Label>
+          <Label className="text-sm">Link DOU</Label>
           <Input
-            className="mt-1 text-sm"
+            className="mt-1 text-base"
             placeholder="https://www.in.gov.br/web/dou/-/..."
             value={form.link_dou ?? ""}
             onChange={(e) => field("link_dou", e.target.value)}
           />
         </div>
         <div className="sm:col-span-2">
-          <Label className="text-xs">Sumário / Ementa da Decisão</Label>
+          <Label className="text-sm">Sumário / Ementa da Decisão</Label>
           <textarea
-            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-y"
+            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-base resize-y"
             rows={3}
             placeholder="Resumo da decisão da DICOL..."
             value={form.sumario_decisao ?? ""}
@@ -169,10 +169,10 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
           className="mt-0.5 w-4 h-4"
         />
         <div>
-          <label htmlFor="efeito_suspensivo" className="text-sm font-semibold text-amber-900 cursor-pointer">
+          <label htmlFor="efeito_suspensivo" className="text-base font-semibold text-amber-900 cursor-pointer">
             Efeito Suspensivo conferido pela DICOL
           </label>
-          <p className="text-xs text-amber-700 mt-0.5">
+          <p className="text-sm text-amber-700 mt-0.5">
             Marque quando a Diretoria Colegiada conferiu efeito suspensivo à medida de proibição/recolhimento/suspensão.
           </p>
         </div>
@@ -187,7 +187,7 @@ function AddAcordaoForm({ resolucaoId, onClose }: { resolucaoId: string; onClose
             onChange={(e) => field("atualizar_status_re", e.target.checked)}
             className="mt-0.5 w-4 h-4"
           />
-          <label htmlFor="atualizar_status" className="text-sm text-blue-800 cursor-pointer">
+          <label htmlFor="atualizar_status" className="text-base text-blue-800 cursor-pointer">
             Atualizar status da RE para <strong>Em Análise</strong> (medida suspensa por decisão DICOL)
           </label>
         </div>
@@ -296,7 +296,7 @@ export default function ResolucaoDetalhe() {
             <img src="/logo.png" alt="RE Monitor Logo" className="w-6 h-6 object-contain" />
           </div>
           <div>
-            <p className="font-bold text-sm tracking-wide text-white">RE MONITOR</p>
+            <p className="font-bold text-base tracking-wide text-white">RE MONITOR</p>
             <p className="text-blue-200 leading-tight" style={{ fontSize: "9px" }}>Consulta Pública de Resoluções - RE ANVISA publicadas em DOU</p>
           </div>
         </div>
@@ -304,7 +304,7 @@ export default function ResolucaoDetalhe() {
 
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Back */}
-        <a href="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors w-fit">
+        <a href="/" className="flex items-center gap-2 text-base text-muted-foreground hover:text-foreground mb-6 transition-colors w-fit">
           <ArrowLeft className="w-4 h-4" />
           Voltar ao Portal
         </a>
@@ -315,12 +315,12 @@ export default function ResolucaoDetalhe() {
             <Scale className="w-5 h-5 mt-0.5 shrink-0 text-amber-700" />
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <Badge className="bg-amber-600 text-white text-xs">EFEITO SUSPENSIVO</Badge>
-                <span className="text-sm font-bold text-amber-900">
+                <Badge className="bg-amber-600 text-white text-sm">EFEITO SUSPENSIVO</Badge>
+                <span className="text-base font-bold text-amber-900">
                   Medida suspensa por decisão da DICOL / Diretoria Colegiada
                 </span>
               </div>
-              <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+              <p className="text-sm text-amber-800 mt-1 leading-relaxed">
                 A Diretoria Colegiada da ANVISA conferiu efeito suspensivo a esta medida sanitária em recurso administrativo.
                 Embora a RE esteja registrada, os efeitos da proibição/recolhimento/suspensão podem estar suspensos judicialmente ou administrativamente.
                 Consulte o acórdão abaixo para detalhes.
@@ -332,7 +332,7 @@ export default function ResolucaoDetalhe() {
                     href={a.link_dou ?? "#"}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-amber-700 font-medium underline-offset-2 hover:underline"
+                    className="inline-flex items-center gap-1 text-sm text-amber-700 font-medium underline-offset-2 hover:underline"
                   >
                     <Gavel className="w-3 h-3" />
                     {a.numero_acordao}
@@ -358,14 +358,14 @@ export default function ResolucaoDetalhe() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <StatusBadge status={re.status} />
-              {re.status === "vigente" && <span className="text-sm font-semibold text-red-700">Esta resolucao esta em vigor</span>}
-              {re.status === "em_analise" && <span className="text-sm font-semibold text-orange-700">Esta resolucao esta em analise</span>}
-              {re.status === "revogada" && <span className="text-sm font-semibold text-gray-600">Esta resolucao foi revogada</span>}
-              {re.status === "encerrada" && <span className="text-sm font-semibold text-blue-700">Esta resolucao foi encerrada</span>}
+              {re.status === "vigente" && <span className="text-base font-semibold text-red-700">Esta resolucao esta em vigor</span>}
+              {re.status === "em_analise" && <span className="text-base font-semibold text-orange-700">Esta resolucao esta em analise</span>}
+              {re.status === "revogada" && <span className="text-base font-semibold text-gray-600">Esta resolucao foi revogada</span>}
+              {re.status === "encerrada" && <span className="text-base font-semibold text-blue-700">Esta resolucao foi encerrada</span>}
             </div>
             <div className="flex flex-wrap gap-1 mt-2">
               {re.tipo_acao?.map((acao) => (
-                <Badge key={acao} variant="outline" className="text-xs">
+                <Badge key={acao} variant="outline" className="text-sm">
                   {acao.replace(/_/g, " ")}
                 </Badge>
               ))}
@@ -376,24 +376,24 @@ export default function ResolucaoDetalhe() {
         {/* Main card */}
         <div className="bg-card border border-border rounded-lg overflow-hidden mb-6">
           <div className="px-6 py-4 border-b border-border bg-muted/30">
-            <p className="text-xs text-muted-foreground font-mono mb-1">{re.numero_re}</p>
+            <p className="text-sm text-muted-foreground font-mono mb-1">{re.numero_re}</p>
             <h1 className="text-xl font-bold text-foreground">{re.nome_produto}</h1>
           </div>
 
           {/* Ementa */}
           <div className="px-6 py-4 border-b border-border">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5" /> Ementa / Motivacao
             </p>
-            <p className="text-sm text-foreground leading-relaxed">{re.ementa}</p>
+            <p className="text-base text-foreground leading-relaxed">{re.ementa}</p>
           </div>
 
           {/* Fields grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border">
             {fields.map((field) => (
               <div key={field.label} className="px-6 py-3 border-b border-border">
-                <p className="text-xs text-muted-foreground mb-0.5">{field.label}</p>
-                <p className="text-sm font-medium text-foreground capitalize">{field.value}</p>
+                <p className="text-sm text-muted-foreground mb-0.5">{field.label}</p>
+                <p className="text-base font-medium text-foreground capitalize">{field.value}</p>
               </div>
             ))}
           </div>
@@ -405,7 +405,7 @@ export default function ResolucaoDetalhe() {
                 href={re.link_documento_oficial}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                className="inline-flex items-center gap-2 text-base text-primary hover:underline"
               >
                 <ExternalLink className="w-4 h-4" />
                 Ver documento oficial no DOU/ANVISA
@@ -419,15 +419,15 @@ export default function ResolucaoDetalhe() {
           <div className="px-6 py-4 border-b border-border flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Gavel className="w-4 h-4 text-amber-600" />
-              <h2 className="font-semibold text-sm">Acórdãos da Diretoria Colegiada (DICOL)</h2>
+              <h2 className="font-semibold text-base">Acórdãos da Diretoria Colegiada (DICOL)</h2>
               {acordaos && acordaos.length > 0 && (
-                <Badge variant="outline" className="text-xs">{acordaos.length}</Badge>
+                <Badge variant="outline" className="text-sm">{acordaos.length}</Badge>
               )}
             </div>
             <Button
               variant="outline"
               size="sm"
-              className="text-xs"
+              className="text-sm"
               onClick={() => setShowAddForm((v) => !v)}
             >
               <Plus className="w-3.5 h-3.5 mr-1" />
@@ -443,7 +443,7 @@ export default function ResolucaoDetalhe() {
             {acordaosLoading ? (
               <div className="space-y-2">{[...Array(2)].map((_, i) => <Skeleton key={i} className="h-16" />)}</div>
             ) : !acordaos || acordaos.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-2">
+              <p className="text-base text-muted-foreground py-2">
                 Nenhum acórdão DICOL registrado para esta RE, no sistema. Caso possuir dados de atualização,
                 insira manualmente em "Registrar Acórdão". As informações serão validadas pelo administrador.
               </p>
@@ -461,7 +461,7 @@ export default function ResolucaoDetalhe() {
                     <div className="flex items-start justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-2 flex-wrap">
                         <Gavel className={`w-4 h-4 shrink-0 ${ac.efeito_suspensivo ? "text-amber-600" : "text-muted-foreground"}`} />
-                        <span className="font-semibold text-sm">{ac.numero_acordao}</span>
+                        <span className="font-semibold text-base">{ac.numero_acordao}</span>
                         {ac.efeito_suspensivo && (
                           <Badge className="bg-amber-600 text-white text-[10px]">EFEITO SUSPENSIVO</Badge>
                         )}
@@ -494,7 +494,7 @@ export default function ResolucaoDetalhe() {
                       </div>
                     </div>
 
-                    <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                    <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
                       <span>DOU: <strong className="text-foreground">{fmtDate(ac.data_publicacao_dou)}</strong></span>
                       {ac.data_decisao && <span>Decisão: <strong className="text-foreground">{fmtDate(ac.data_decisao)}</strong></span>}
                       {ac.relator && <span>Relator: <strong className="text-foreground">{ac.relator}</strong></span>}
@@ -504,7 +504,7 @@ export default function ResolucaoDetalhe() {
                     {expandedAcordao === ac.id && (
                       <div className="mt-3 space-y-2">
                         {ac.sumario_decisao && (
-                          <div className="text-xs text-foreground bg-white/60 border border-border rounded p-3 leading-relaxed">
+                          <div className="text-sm text-foreground bg-white/60 border border-border rounded p-3 leading-relaxed">
                             <p className="font-semibold text-muted-foreground mb-1">Sumário da Decisão</p>
                             {ac.sumario_decisao}
                           </div>
@@ -514,7 +514,7 @@ export default function ResolucaoDetalhe() {
                             href={ac.link_dou}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                           >
                             <ExternalLink className="w-3 h-3" />
                             Ver acórdão no DOU
@@ -533,7 +533,7 @@ export default function ResolucaoDetalhe() {
         <div className="bg-card border border-border rounded-lg overflow-hidden">
           <div className="px-6 py-4 border-b border-border flex items-center gap-2">
             <Clock className="w-4 h-4 text-muted-foreground" />
-            <h2 className="font-semibold text-sm">Historico de Alteracoes</h2>
+            <h2 className="font-semibold text-base">Historico de Alteracoes</h2>
           </div>
           <div className="px-6 py-4">
             {historicoLoading ? (
@@ -541,7 +541,7 @@ export default function ResolucaoDetalhe() {
                 {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16" />)}
               </div>
             ) : historico?.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhuma alteracao registrada.</p>
+              <p className="text-base text-muted-foreground">Nenhuma alteracao registrada.</p>
             ) : (
               <div className="space-y-4">
                 {historico?.map((entry, idx) => {
@@ -566,10 +566,10 @@ export default function ResolucaoDetalhe() {
                     >
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         {isDicol && <Gavel className="w-3.5 h-3.5 text-amber-600 shrink-0" />}
-                        <span className="text-xs font-medium text-foreground">
+                        <span className="text-sm font-medium text-foreground">
                           {entry.alterado_por_nome || "Sistema"}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-sm text-muted-foreground">
                           {fmtDatetime(entry.created_at)}
                         </span>
                         <Badge
@@ -589,14 +589,14 @@ export default function ResolucaoDetalhe() {
                         )}
                       </div>
                       {entry.justificativa && (
-                        <p className="text-xs text-muted-foreground leading-relaxed">{entry.justificativa}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{entry.justificativa}</p>
                       )}
                       {isDicol && !!acordaoData?.link_dou && (
                         <a
                           href={String(acordaoData.link_dou)}
                           target="_blank"
                           rel="noreferrer"
-                          className="mt-1 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                          className="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline"
                         >
                           <ExternalLink className="w-3 h-3" />
                           Ver acórdão no DOU
