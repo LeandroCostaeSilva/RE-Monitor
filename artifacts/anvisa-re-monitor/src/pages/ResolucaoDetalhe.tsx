@@ -291,9 +291,14 @@ export default function ResolucaoDetalhe() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-primary text-primary-foreground shadow-md">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
-          <img src="/logo.png" alt="RE Monitor Logo" className="w-6 h-6 object-contain" />
-          <span className="font-bold text-sm tracking-wide">RE MONITOR</span>
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-2">
+          <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-sm flex-shrink-0">
+            <img src="/logo.png" alt="RE Monitor Logo" className="w-6 h-6 object-contain" />
+          </div>
+          <div>
+            <p className="font-bold text-sm tracking-wide text-white">RE MONITOR</p>
+            <p className="text-blue-200 leading-tight" style={{ fontSize: "9px" }}>Consulta Pública de Resoluções - RE ANVISA publicadas em DOU</p>
+          </div>
         </div>
       </header>
 
