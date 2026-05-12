@@ -611,6 +611,15 @@ export default function ResolucaoDetalhe() {
         </div>
 
       </div>
+
+      <footer className="border-t border-border mt-8 py-4">
+        <div className="max-w-4xl mx-auto px-4 text-center text-sm text-muted-foreground">
+          Contato:{" "}
+          <a href="mailto:remonitoronline@gmail.com" className="text-primary hover:underline">
+            remonitoronline@gmail.com
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }
