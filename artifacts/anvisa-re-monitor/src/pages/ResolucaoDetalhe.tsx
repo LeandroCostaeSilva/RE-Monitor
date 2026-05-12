@@ -439,8 +439,8 @@ export default function ResolucaoDetalhe() {
               <div className="space-y-2">{[...Array(2)].map((_, i) => <Skeleton key={i} className="h-16" />)}</div>
             ) : !acordaos || acordaos.length === 0 ? (
               <p className="text-sm text-muted-foreground py-2">
-                Nenhum acórdão DICOL registrado para esta RE. Use o botão acima para registrar manualmente
-                ou acione a varredura automática do DOU na página de Sincronização.
+                Nenhum acórdão DICOL registrado para esta RE, no sistema. Caso possuir dados de atualização,
+                insira manualmente em "Registrar Acórdão". As informações serão validadas pelo administrador.
               </p>
             ) : (
               <div className="space-y-3">
