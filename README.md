@@ -1,10 +1,6 @@
 # RE Monitor — ANVISA Specific Resolutions Monitoring System
 
 <p align="center">
-  <img src="artifacts/anvisa-re-monitor/public/logo.png" alt="RE Monitor Logo" width="80" />
-</p>
-
-<p align="center">
   <strong>Sistema profissional de monitoramento e gestão de Resoluções Específicas (REs) da ANVISA publicadas no Diário Oficial da União.</strong>
 </p>
 
