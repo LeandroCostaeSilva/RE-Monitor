@@ -20,7 +20,7 @@
 
 O **RE Monitor** é uma plataforma web desenvolvida para o monitoramento e consulta pública das **Resoluções Específicas (REs)** emitidas pela ANVISA — Agência Nacional de Vigilância Sanitária. Essas resoluções determinam a suspensão da comercialização, importação, distribuição ou fabricação de produtos sujeitos a vigilância sanitária com irregularidades identificadas.
 
-O sistema integra consulta pública aberta à população, painel de gestão interno e sincronização automática com o Diário Oficial da União (DOU) via IA, e rastreamento de decisões da Diretoria Colegiada (DICOL) com efeito suspensivo sobre medidas sanitárias ativas, além de inserção manual interna de acórdãos publicados.
+O sistema integra consulta pública aberta à população, painel de gestão interno e sincronização automática com o Diário Oficial da União (DOU) via IA com rastreamento de decisões da Diretoria Colegiada (DICOL) de efeito suspensivo sobre medidas sanitárias ativas, além de inserção manual interna de acórdãos publicados.
 
 ---
 
