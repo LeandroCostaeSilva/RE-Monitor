@@ -192,5 +192,5 @@ A API segue o padrão REST com contrato OpenAPI. Todos os endpoints estão sob o
 ---
 
 <p align="center">
-  Desenvolvido para apoiar a fiscalização sanitária brasileira — ANVISA RE Monitor &copy; 2025
+  Desenvolvido para apoiar a fiscalização sanitária brasileira — RE Monitor &copy; 2025
 </p>
